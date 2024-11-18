@@ -1,10 +1,10 @@
 #include "NetworkDiscover.h"
 
 #include <QProcess>
-
+#include <QQmlContext>
 #include <QDebug>
 
-NetworkDiscover::NetworkDiscover(QObject* parent)
+NetworkControl::NetworkControl(QObject* parent)
     : QObject(parent)
 {
     QQmlEngine::setObjectOwnership(this, QQmlEngine::CppOwnership);
@@ -13,13 +13,13 @@ NetworkDiscover::NetworkDiscover(QObject* parent)
     qDebug() << "i'm alive";
 }
 
-QStringList NetworkDiscover::availableWiFiNets() const
+QStringList NetworkControl::availableWiFiNets() const
 {
 
     return m_availableWiFiNets;
 }
 
-void NetworkDiscover::updateWiFiInfo()
+void NetworkControl::updateWiFiInfo()
 {
     qDebug() << "press";
     m_availableWiFiNets.clear();
@@ -30,7 +30,7 @@ void NetworkDiscover::updateWiFiInfo()
      * эта команда выводит построчно дочтупные SSID сетей wifi если на таргет системе wifi запущен
      * */
     // запускаем желаемую команду
-    process.start("nmcli", QStringList() << "--field" << "SSID" << "device" << "wifi");
+    process.start("nmcli", QStringList() << "--field" << "SSID" << "device" << "wifi" << "list" << "--rescan" << "yes");
 
     //ожидаем выполнения (5 сек максимум)
     process.waitForFinished(5000);
@@ -56,6 +56,11 @@ void NetworkDiscover::updateWiFiInfo()
     }
     qDebug() << "end update";
     emit availableWiFiNetsChanged();
+}
+
+void NetworkControl::registerNetworkControl()
+{
+    qmlRegisterType<NetworkControl>("BackEnd", 1, 0, "NetworkSearch");
 }
 
 

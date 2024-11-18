@@ -10,9 +10,7 @@ int main(int argc, char *argv[])
 
     QGuiApplication app(argc, argv);
 
-    // NetworkDiscover net;
-    // net.updateWiFiInfo();
-    qmlRegisterType<NetworkDiscover>("BackEnd", 1, 0, "NetworkSearch");
+    NetworkControl::registerNetworkControl();
 
     QQmlApplicationEngine engine;
     const QUrl url(QStringLiteral("qrc:/main.qml"));
