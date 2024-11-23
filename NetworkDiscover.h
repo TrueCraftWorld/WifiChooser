@@ -15,6 +15,7 @@ public:
 
     QStringList availableWiFiNets() const;
     Q_INVOKABLE void updateWiFiInfo();
+    Q_INVOKABLE bool tryConnect(int idx, const QString& pass);
 
     static void registerNetworkControl();
 

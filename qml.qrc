@@ -2,5 +2,6 @@
     <qresource prefix="/">
         <file>main.qml</file>
         <file>WifiView.qml</file>
+        <file>WiFiPassRequest.qml</file>
     </qresource>
 </RCC>

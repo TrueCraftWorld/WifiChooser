@@ -4,6 +4,8 @@
 #include <QQmlContext>
 #include <QDebug>
 
+#include <string>
+
 NetworkControl::NetworkControl(QObject* parent)
     : QObject(parent)
 {
@@ -56,6 +58,27 @@ void NetworkControl::updateWiFiInfo()
     }
     qDebug() << "end update";
     emit availableWiFiNetsChanged();
+}
+
+bool NetworkControl::tryConnect(int idx, const QString &pass)
+{
+    //nmcli device wifi connect SSID_or_BSSID password password
+    if (idx < 0 || idx >= m_availableWiFiNets.size())
+        return false;
+    QProcess process;
+    //защита от пробелов в имени
+    QString ssid_name = QString("%1").arg(m_availableWiFiNets.at(idx));
+    // qDebug() << "nmcli " << "device " << "wifi " << "connect " << ssid_name << " password " << pass;
+    QStringList list;
+    list << "device" << "wifi" << "connect" << ssid_name.toStdString().c_str() << "password" << pass.toStdString().c_str();
+    process.start("nmcli", list);
+    process.waitForFinished(5000);
+    QByteArray rawConsoleOutput = process.readAllStandardOutput();
+    QString consoleString(rawConsoleOutput);
+    qDebug() << list;
+    qDebug() << consoleString;
+    return true;
+
 }
 
 void NetworkControl::registerNetworkControl()

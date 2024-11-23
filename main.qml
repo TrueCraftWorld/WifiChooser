@@ -42,28 +42,39 @@ ApplicationWindow {
             onClicked: {
                 console.log("bla");
                 wifi_handle.updateWiFiInfo();
-                // butt.color = butt.color == "blue" ? "white" : "blue"
             }
         }
     }
     Rectangle {
         id: viewContainer
-        width: 1280
+        width: 800
         height: 720
+
         color: "darkorchid"
         opacity: 0.75
+        border {
+            width: 2
+            color: "black"
+        }
+
         anchors {
             top: butt.bottom
-            horizontalCenter: parent.horizontalCenter
+            left: parent.left
         }
         WifiView {
             id: ssid_selector
-            currentIndex: 2
+            // currentIndex: 2
+            height: viewContainer.height
             model: wifi_handle.availableWiFiNets
             anchors {
                 horizontalCenter: parent.horizontalCenter
             }
         }
     }
-
+    Connections {
+        target: ssid_selector
+        function onNetworkChosen(idx: int, passwd: string) {
+            wifi_handle.tryConnect(idx, passwd)
+        }
+    }
 }
