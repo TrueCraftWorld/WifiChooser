@@ -3,6 +3,7 @@
 #include <QProcess>
 #include <QQmlContext>
 #include <QDebug>
+#include <QNetworkInterface>
 
 #include <string>
 
@@ -69,21 +70,56 @@ bool NetworkControl::tryConnect(int idx, const QString &pass)
     //защита от пробелов в имени
     QString ssid_name = QString("%1").arg(m_availableWiFiNets.at(idx));
     // qDebug() << "nmcli " << "device " << "wifi " << "connect " << ssid_name << " password " << pass;
-    QStringList list;
-    list << "device" << "wifi" << "connect" << ssid_name.toStdString().c_str() << "password" << pass.toStdString().c_str();
-    process.start("nmcli", list);
+    // QStringList list;
+    // list << "device" << "wifi" << "connect" << ssid_name.toStdString().c_str() << "password" << pass.toStdString().c_str();
+    process.start("nmcli", QStringList() << "device" << "wifi" << "connect" << ssid_name.toStdString().c_str() << "password" << pass.toStdString().c_str());
     process.waitForFinished(5000);
-    QByteArray rawConsoleOutput = process.readAllStandardOutput();
-    QString consoleString(rawConsoleOutput);
-    qDebug() << list;
-    qDebug() << consoleString;
+
+
+    // findWiFiIP();
     return true;
 
+}
+
+QString NetworkControl::getWifiIP()
+{
+    findWiFiIP();
+    if (ip_addrs.isEmpty())
+        return QString("");
+    return ip_addrs.at(0);
 }
 
 void NetworkControl::registerNetworkControl()
 {
     qmlRegisterType<NetworkControl>("BackEnd", 1, 0, "NetworkSearch");
+}
+
+void NetworkControl::findWiFiIP()
+{
+    // foreach (const QNetworkInterface &netInterface, QNetworkInterface::allInterfaces()) {
+    //     QNetworkInterface::InterfaceFlags flags = netInterface.flags();
+
+    // }
+
+    //     QNetworkInterface::InterfaceFlags flags = netInterface.flags();
+    //     if( (bool)(flags & QNetworkInterface::IsRunning) && !(bool)(flags & QNetworkInterface::IsLoopBack)){
+    //         foreach (const QNetworkAddressEntry &address, netInterface.addressEntries()) {
+    //             if(address.ip().protocol() == QAbstractSocket::IPv4Protocol)
+    //                 qDebug() << address.ip().toString();
+    //         }
+    //     }
+    // }
+    //тут у нас прямо-так жуткий хардкод. но у нас жёстко зафиксировано устройство и ПО - наверное будет работать
+    ip_addrs.clear();
+    QNetworkInterface netInterface = QNetworkInterface::interfaceFromIndex(3);
+    if (netInterface.flags() & QNetworkInterface::IsRunning) {
+        foreach (const QNetworkAddressEntry &address, netInterface.addressEntries()) {
+            if(address.ip().protocol() == QAbstractSocket::IPv4Protocol) {
+                qDebug() << address.ip().toString();
+                ip_addrs.append(address.ip().toString());
+            }
+        }
+    }
 }
 
 

@@ -16,6 +16,7 @@ public:
     QStringList availableWiFiNets() const;
     Q_INVOKABLE void updateWiFiInfo();
     Q_INVOKABLE bool tryConnect(int idx, const QString& pass);
+    Q_INVOKABLE QString getWifiIP();
 
     static void registerNetworkControl();
 
@@ -23,7 +24,10 @@ signals:
     void availableWiFiNetsChanged();
 
 private:
+    void findWiFiIP();
+
     QStringList m_availableWiFiNets;
+    QStringList ip_addrs;
 };
 
 #endif // NETWORKDISCOVER_H

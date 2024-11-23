@@ -3,5 +3,6 @@
         <file>main.qml</file>
         <file>WifiView.qml</file>
         <file>WiFiPassRequest.qml</file>
+        <file>WiFiConnector.qml</file>
     </qresource>
 </RCC>
