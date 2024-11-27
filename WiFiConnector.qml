@@ -11,6 +11,9 @@ Item {
         onAvailableWiFiNetsChanged: {
             ssid_selector.model = wifi_handle.availableWiFiNets
         }
+        onSignalIpReady: {
+            ip_text.text = "IP: " + wifi_handle.getWifiIP()
+        }
     }
 
     Button {
@@ -98,5 +101,6 @@ Item {
             wifi_handle.tryConnect(idx, passwd)
             ip_text.text = "IP: " + wifi_handle.getWifiIP()
         }
+
     }
 }

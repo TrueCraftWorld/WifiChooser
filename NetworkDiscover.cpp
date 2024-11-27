@@ -4,6 +4,7 @@
 #include <QQmlContext>
 #include <QDebug>
 #include <QNetworkInterface>
+#include <QTimer>
 
 #include <string>
 
@@ -74,7 +75,7 @@ bool NetworkControl::tryConnect(int idx, const QString &pass)
     // list << "device" << "wifi" << "connect" << ssid_name.toStdString().c_str() << "password" << pass.toStdString().c_str();
     process.start("nmcli", QStringList() << "device" << "wifi" << "connect" << ssid_name.toStdString().c_str() << "password" << pass.toStdString().c_str());
     process.waitForFinished(5000);
-
+    QTimer::singleShot(5000, Qt::CoarseTimer, this, &NetworkControl::findWiFiIP);
 
     // findWiFiIP();
     return true;
@@ -83,10 +84,10 @@ bool NetworkControl::tryConnect(int idx, const QString &pass)
 
 QString NetworkControl::getWifiIP()
 {
-    findWiFiIP();
-    if (ip_addrs.isEmpty())
+    // findWiFiIP();
+    if (m_ip_addrs.isEmpty())
         return QString("");
-    return ip_addrs.at(0);
+    return m_ip_addrs.at(0);
 }
 
 void NetworkControl::registerNetworkControl()
@@ -110,16 +111,38 @@ void NetworkControl::findWiFiIP()
     //     }
     // }
     //тут у нас прямо-так жуткий хардкод. но у нас жёстко зафиксировано устройство и ПО - наверное будет работать
-    ip_addrs.clear();
+    m_ip_addrs.clear();
     QNetworkInterface netInterface = QNetworkInterface::interfaceFromIndex(3);
     if (netInterface.flags() & QNetworkInterface::IsRunning) {
         foreach (const QNetworkAddressEntry &address, netInterface.addressEntries()) {
             if(address.ip().protocol() == QAbstractSocket::IPv4Protocol) {
                 qDebug() << address.ip().toString();
-                ip_addrs.append(address.ip().toString());
+                m_ip_addrs.append(address.ip().toString());
             }
         }
     }
+    if (!m_ip_addrs.isEmpty()) {
+        emit signalIpReady();
+    }
 }
 
+QStringList NetworkControl::ip_addrs() const
+{
+    return m_ip_addrs;
+}
 
+/* читщит nmcli
+ * nmcli radio wifi on/off
+ *
+ * nmcli - g IP4.ADDRESS device show wlan0
+ *
+ * nmcli device wifi connect "$SSID" password "$PASSWORD"
+ * nmcli --wait 15 device wifi connect "$SSID" password "$PASSWORD"
+ *
+ * nmcli connection show --active
+ * nmcli --field TYPE,NAME connection show --active
+ *
+ * nmcli --field SSID device wifi
+ * nmcli --field SSID,IN-USE device wifi
+ * nmcli --field SSID,IN-USE --mode multiline device wifi
+ * */

@@ -63,10 +63,10 @@ ListView {
 
         TapHandler {
             onTapped: {
-                if (!isCurrent) {
+                // if (!isCurrent) {
                     // view.currentIndex = wifi_view.indexAt(wifi_deledgate.x+1,wifi_deledgate.y+1);
                     createPasswordPopUp(ssid_string.text)
-                }
+                // }
             }
         }
     }
