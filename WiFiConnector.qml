@@ -11,28 +11,49 @@ Item {
         onAvailableWiFiNetsChanged: {
             ssid_selector.model = wifi_handle.availableWiFiNets
         }
-        onSignalIpReady: {
-            ip_text.text = "IP: " + wifi_handle.getWifiIP()
+        onWifiStateChanged: {
+            if (wifi_handle.wifiState) {
+                ssid_selector.visible = true
+                ssid_selector.model = wifi_handle.availableWiFiNets
+            } else {
+                ssid_selector.visible = false
+            }
         }
     }
 
     Button {
         id: butt
-        width: 1280
+        width: 640
         height: 80
         anchors {
+            left: parent.left
             top: parent.top
-            horizontalCenter: parent.horizontalCenter
         }
-        // anchors.fill: parent
         onClicked: {
-            console.log("bla");
             wifi_handle.updateWiFiInfo();
         }
         Text {
-            anchors.fill: parent
+            anchors.fill: butt
             color: "black"
             text: "Обновить список"
+        }
+    }
+    Button {
+
+        id: butt2
+        width: 640
+        height: 80
+        anchors {
+            left: butt.right
+            top: parent.top
+        }
+        onClicked: {
+            wifi_handle.wifiState = !wifi_handle.wifiState
+        }
+        Text {
+            anchors.fill: butt2
+            color: "black"
+            text: wifi_handle.wifiState ? "WiFi запущен" : "WiFi выключен"
         }
     }
 
@@ -54,7 +75,6 @@ Item {
         }
         WifiView {
             id: ssid_selector
-            // currentIndex: 2
             height: viewContainer.height
             model: wifi_handle.availableWiFiNets
             anchors {
@@ -89,7 +109,7 @@ Item {
                 topMargin: 15
 
             }
-            text: "IP:"
+            text: "IP: " + wifi_handle.currentIp
         }
     }
 

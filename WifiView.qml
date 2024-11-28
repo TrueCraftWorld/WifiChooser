@@ -4,7 +4,6 @@ import QtQuick 2.15
 ListView {
     id: wifi_view
     width: 620
-    // height:
     required model
     property var passwordPopUp: null
 
@@ -49,7 +48,7 @@ ListView {
         property bool isCurrent: ListView.isCurrentItem
 
         border.color: "darkblue"
-        color: isCurrent ? "#157efb":"#53d769"
+        color: /*isCurrent ? "#157efb":*/"#53d769"
         radius: 10
 
         anchors.margins: 20
@@ -63,10 +62,7 @@ ListView {
 
         TapHandler {
             onTapped: {
-                // if (!isCurrent) {
-                    // view.currentIndex = wifi_view.indexAt(wifi_deledgate.x+1,wifi_deledgate.y+1);
-                    createPasswordPopUp(ssid_string.text)
-                // }
+                createPasswordPopUp(ssid_string.text)
             }
         }
     }
