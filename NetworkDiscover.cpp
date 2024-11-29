@@ -83,17 +83,21 @@ void NetworkControl::updateWiFiInfo()
 bool NetworkControl::tryConnect(int idx, const QString &pass)
 {
     //nmcli --wait 5 device wifi connect SSID_or_BSSID password password
+
     if (idx < 0 || idx >= m_availableWiFiNets.size())
         return false;
+    m_currentIp = "-----";
     //защита от пробелов в имени
-    QString ssid_name = QString("'%1'").arg(m_availableWiFiNets.at(idx));
+    QString ssid_name = QString("%1").arg(m_availableWiFiNets.at(idx));
     // list << "device" << "wifi" << "connect" << ssid_name.toStdString().c_str() << "password" << pass.toStdString().c_str();
     QString consoleString = nmcliCommand(QStringList() << "--wait" << "10" << "device" << "wifi" << "connect" << ssid_name.toStdString().c_str() << "password" << pass.toStdString().c_str(),
                                          10000);
-    if (consoleString.contains("Ошибка"))
+    qDebug() << "connect" << ssid_name.toStdString().c_str() << "password" << pass.toStdString().c_str();
+    if (consoleString.contains("Ошибка")) {
+        m_currentIp = "0";
         return false;
-
-    checkIpAddrOnWlan0();
+    }
+    // checkIpAddrOnWlan0();
     return true;
 }
 

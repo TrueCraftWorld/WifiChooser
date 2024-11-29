@@ -118,8 +118,8 @@ Item {
     Connections {
         target: ssid_selector
         function onNetworkChosen(idx: int, passwd: string) {
+            console.log("pass try")
             wifi_handle.tryConnect(idx, passwd)
-            ip_text.text = "IP: " + wifi_handle.getWifiIP()
         }
 
     }
