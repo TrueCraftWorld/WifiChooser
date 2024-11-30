@@ -6,7 +6,7 @@ Rectangle {
     width: 600
     height: 400
     radius: 10
-
+    opacity: 1
     property string ssid_name
     signal passwordAccepted(password: string)
     signal destroyMe()
@@ -18,8 +18,10 @@ Rectangle {
         anchors {
             left: parent.left
             top: parent.top
+            topMargin: 5
+            horizontalCenter: parent.horizontalCenter
         }
-        text: "ВВЕДИТЕ ПАРОЛЬ"
+        text: qsTr("ВВЕДИТЕ ПАРОЛЬ")
     }
 
     Rectangle {
@@ -35,6 +37,7 @@ Rectangle {
         Text {
             anchors.fill: parent
             text: "SSID: " + ssid_name
+            anchors.leftMargin: 15
         }
     }
     Rectangle {
@@ -50,20 +53,21 @@ Rectangle {
         TextInput {
             id: passwd_text
             anchors.fill: parent
+            anchors.leftMargin: 15
         }
     }
     Button {
         id: pass_req_accept_button
         width: parent.width * .8
-        height: 40
+        height: 20
         anchors {
             top: pass_req_pswd.bottom
             topMargin: 10
             horizontalCenter: parent.horizontalCenter
         }
         Text {
-            anchors.fill: parent
-            text: "OK"
+            anchors.centerIn: parent
+            text: qsTr("Подключить")
         }
         onClicked: {
             passwordAccepted(passwd_text.text)
@@ -72,15 +76,15 @@ Rectangle {
     Button {
         id: pass_req_cancel_button
         width: parent.width * .8
-        height: 40
+        height: 20
         anchors {
             top: pass_req_accept_button.bottom
             topMargin: 10
             horizontalCenter: parent.horizontalCenter
         }
         Text {
-            anchors.fill: parent
-            text: "Cancel"
+            anchors.centerIn: parent
+            text: qsTr("Отмена")
         }
         onClicked: {
             destroyMe()

@@ -1,13 +1,14 @@
 import QtQuick 2.15
-
+import com.melije.pulltorefresh 2.0
 
 ListView {
     id: wifi_view
-    width: 620
+    width: parent.width * .9
     required model
     property var passwordPopUp: null
     property int requstedSsidIdx;
     signal networkChosen(id: int, passwd: string)
+    signal updateMe
 
 
 
@@ -15,7 +16,7 @@ ListView {
         if (passwordPopUp === null) {
             var component = Qt.createComponent("WiFiPassRequest.qml")
             if (component.status === Component.Ready){
-                passwordPopUp = component.createObject( wifi_view, {"x":0, "y":0, "ssid_name": ssid_name})
+                passwordPopUp = component.createObject( wifi_view, {"x":0, "y":50, "ssid_name": ssid_name})
                 if (passwordPopUp) {
                     passwordPopUp.passwordAccepted.connect( tryConnection )
                     passwordPopUp.destroyMe.connect( deletePasswordPopUp )
@@ -39,6 +40,7 @@ ListView {
 
     header: headerComponent
     clip: true
+
 
     delegate: Rectangle {
         id: wifi_deledgate
@@ -69,12 +71,20 @@ ListView {
         }
     }
 
-    Component {
-        id: headerComponent
+    // Component {
+    //     id: headerComponent
 
-        Rectangle {
-            width: ListView.view.width
-            height: 20
+    //     Rectangle {
+    //         width: ListView.view.width
+    //         height: 20
+    //     }
+    // }
+
+    PullToRefreshHandler
+    {
+        onPullDownRelease:
+        {
+           updateMe() // Add your handling code here:
         }
     }
 }

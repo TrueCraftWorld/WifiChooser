@@ -21,63 +21,63 @@ Item {
         }
     }
 
-    Button {
-        id: butt
-        width: 640
-        height: 80
-        anchors {
-            left: parent.left
-            top: parent.top
-        }
-        onClicked: {
-            wifi_handle.updateWiFiInfo();
-        }
-        Text {
-            anchors.fill: butt
-            color: "black"
-            text: "Обновить список"
-        }
-    }
-    Button {
+    Rectangle {
+        id: topStatus
 
-        id: butt2
-        width: 640
-        height: 80
-        anchors {
-            left: butt.right
+        height: 50
+        anchors{
+            left: parent.left
+            right: parent.right
             top: parent.top
         }
-        onClicked: {
-            wifi_handle.wifiState = !wifi_handle.wifiState
-        }
         Text {
-            anchors.fill: butt2
+            anchors.fill: parent
+            horizontalAlignment: Text.AlignHCenter
             color: "black"
-            text: wifi_handle.wifiState ? "WiFi запущен" : "WiFi выключен"
+            text: qsTr("Настройки сети")
         }
     }
 
     Rectangle {
         id: viewContainer
-        width: 650
-        height: 720
+        width: parent.width * .6
+        // height: parent.height
 
-        color: "darkorchid"
+        color: "darkslategray"
         opacity: 0.75
         border {
-            width: 2
+            width: 1
             color: "black"
         }
 
         anchors {
-            top: butt.bottom
-            left: parent.left
+            top: topStatus.bottom
+            left: ipContainer.right
+            bottom: parent.bottom
         }
+        Rectangle{
+            id: ssid_selector_title
+            color: "darkslategray"
+            width: parent.width
+            height: 50
+            anchors {
+                top: parent.top
+            }
+            Text {
+                anchors.fill: parent
+                horizontalAlignment: Text.AlignHCenter
+                color: "white"
+                text: qsTr("Доступные Wi-Fi сети")
+            }
+        }
+
         WifiView {
             id: ssid_selector
             height: viewContainer.height
             model: wifi_handle.availableWiFiNets
             anchors {
+                top: ssid_selector_title.bottom
+                bottom: parent.bottom
                 horizontalCenter: parent.horizontalCenter
             }
         }
@@ -85,51 +85,92 @@ Item {
 
     Rectangle {
         id: ipContainer
-        width: 1280-650
-        height: 720
+        width: parent.width * .4
+        // height: parent.height
 
-        color: "darkorchid"
+        color: "darkslategray"
         opacity: 0.75
         border {
-            width: 2
+            width: 1
             color: "black"
         }
 
         anchors {
-            top: butt.bottom
-            left: viewContainer.right
+            top: topStatus.bottom
+            left: parent.left
+            bottom: parent.bottom
         }
+        StyledSwitch {
+            id:wifiSwitch
+
+            anchors {
+                top: parent.top
+                left: parent.left
+                leftMargin: 25
+                topMargin: 25
+            }
+
+            text: qsTr("Wi-Fi")
+            checked:  wifi_handle.wifiState
+
+            onToggled: {
+                wifi_handle.wifiState = wifiSwitch.checked
+            }
+
+        }
+        StyledSwitch {
+            id: vpnSwitch
+            anchors {
+                top: wifiSwitch.bottom
+                left: parent.left
+                leftMargin: 25
+                topMargin: 15
+            }
+            text: qsTr("VPN FOTEK")
+
+            enabled: false
+        }
+
+        Text {
+            id: ip_title
+
+            width: parent.width
+            anchors {
+                top: vpnSwitch.bottom
+                left: parent.left
+                topMargin: 40
+                leftMargin: 10
+
+            }
+            color: "white"
+            text:qsTr("Текущий IP-адрес устройства:")
+        }
+
         Text {
             id: ip_text
 
             width: parent.width
             anchors {
-                top: parent.top
+                top: ip_title.bottom
                 left: parent.left
                 topMargin: 15
                 leftMargin: 10
 
             }
-            text: "IP: " + wifi_handle.currentIp
+            color: "white"
+            text: wifi_handle.currentIp
         }
-        Text {
-            id: nmcli_respond
-            width: parent.width
-            anchors {
-                top: ip_text.bottom
-                left: parent.left
-                topMargin: 15
-                leftMargin: 10
-            }
-        }
+
     }
 
     Connections {
         target: ssid_selector
         function onNetworkChosen(idx: int, passwd: string) {
-            console.log("pass try")
             wifi_handle.tryConnect(idx, passwd)
         }
-
+        function onUpdateMe() {
+            wifi_handle.updateWiFiInfo()
+        }
     }
+
 }

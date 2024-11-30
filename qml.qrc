@@ -4,5 +4,6 @@
         <file>WifiView.qml</file>
         <file>WiFiPassRequest.qml</file>
         <file>WiFiConnector.qml</file>
+        <file>StyledSwitch.qml</file>
     </qresource>
 </RCC>
