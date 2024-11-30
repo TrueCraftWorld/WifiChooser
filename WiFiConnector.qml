@@ -120,13 +120,9 @@ Item {
                 left: parent.left
                 topMargin: 15
                 leftMargin: 10
-
             }
-            text: wifi_handle.nmcliResponce
         }
     }
-
-
 
     Connections {
         target: ssid_selector
