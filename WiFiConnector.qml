@@ -59,7 +59,7 @@ Item {
 
     Rectangle {
         id: viewContainer
-        width: 800
+        width: 650
         height: 720
 
         color: "darkorchid"
@@ -85,7 +85,7 @@ Item {
 
     Rectangle {
         id: ipContainer
-        width: 1280-800
+        width: 1280-650
         height: 720
 
         color: "darkorchid"
@@ -107,9 +107,22 @@ Item {
                 top: parent.top
                 left: parent.left
                 topMargin: 15
+                leftMargin: 10
 
             }
             text: "IP: " + wifi_handle.currentIp
+        }
+        Text {
+            id: nmcli_respond
+            width: parent.width
+            anchors {
+                top: ip_text.bottom
+                left: parent.left
+                topMargin: 15
+                leftMargin: 10
+
+            }
+            text: wifi_handle.nmcliResponce
         }
     }
 

@@ -6,7 +6,7 @@ ListView {
     width: 620
     required model
     property var passwordPopUp: null
-
+    property int requstedSsidIdx;
     signal networkChosen(id: int, passwd: string)
 
 
@@ -24,7 +24,7 @@ ListView {
         }
     }
     function tryConnection(passwd: string) {
-        networkChosen(wifi_view.currentIndex, passwd)
+        networkChosen(wifi_view.requstedSsidIdx, passwd)
         deletePasswordPopUp()
     }
 
@@ -47,6 +47,7 @@ ListView {
         property var view: ListView.view
         property bool isCurrent: ListView.isCurrentItem
 
+
         border.color: "darkblue"
         color: /*isCurrent ? "#157efb":*/"#53d769"
         radius: 10
@@ -62,6 +63,7 @@ ListView {
 
         TapHandler {
             onTapped: {
+                wifi_view.requstedSsidIdx = wifi_view.indexAt(wifi_deledgate.x+1,wifi_deledgate.y+1);
                 createPasswordPopUp(ssid_string.text)
             }
         }

@@ -37,10 +37,13 @@ public:
 
     QString currentIp() const;
 
+    QString nmcliResponce() const;
+
 signals:
     void availableWiFiNetsChanged();
     void wifiStateChanged();
     void currentIpChanged();
+
 
 protected:
     void timerEvent(QTimerEvent *event) override;

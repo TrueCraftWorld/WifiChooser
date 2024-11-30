@@ -39,7 +39,6 @@ NetworkControl::NetworkControl(QObject* parent)
     }
     startTimer(5000);
     m_availableWiFiNets.clear();
-    qDebug() << "i'm alive";
 }
 
 QStringList NetworkControl::availableWiFiNets() const
@@ -74,9 +73,7 @@ void NetworkControl::updateWiFiInfo()
         if (nameTrim != "SSID")
             m_availableWiFiNets.append(nameTrim);
 
-        qDebug() << nameTrim;
     }
-    qDebug() << "end update";
     emit availableWiFiNetsChanged();
 }
 
@@ -90,8 +87,8 @@ bool NetworkControl::tryConnect(int idx, const QString &pass)
     //защита от пробелов в имени
     QString ssid_name = QString("%1").arg(m_availableWiFiNets.at(idx));
     // list << "device" << "wifi" << "connect" << ssid_name.toStdString().c_str() << "password" << pass.toStdString().c_str();
-    QString consoleString = nmcliCommand(QStringList() << "--wait" << "10" << "device" << "wifi" << "connect" << ssid_name.toStdString().c_str() << "password" << pass.toStdString().c_str(),
-                                         10000);
+    QString consoleString = nmcliCommand(QStringList() << "--wait" << "50" << "device" << "wifi" << "connect" << ssid_name.toStdString().c_str() << "password" << pass.toStdString().c_str(),
+                                         50500);
     qDebug() << "connect" << ssid_name.toStdString().c_str() << "password" << pass.toStdString().c_str();
     if (consoleString.contains("Ошибка")) {
         m_currentIp = "0";
@@ -122,7 +119,6 @@ void NetworkControl::checkWifiState()
         m_wifiState = newState;
         emit wifiStateChanged();
     }
-     qDebug() << "wifi checked";
 }
 
 void NetworkControl::setWifiEnabledState(bool enable)
@@ -152,6 +148,9 @@ QString NetworkControl::nmcliCommand(const QStringList &command, int msecTimeout
     QProcess process;
     process.start("nmcli", command);
     process.waitForFinished(msecTimeout);
+    if (process.state() == QProcess::Running){
+        process.terminate();
+    }
     return QString(process.readAllStandardOutput()).trimmed();
 }
 
@@ -180,3 +179,5 @@ void NetworkControl::timerEvent(QTimerEvent */*event*/)
     checkWifiState();
     checkIpAddrOnWlan0();
 }
+
+
