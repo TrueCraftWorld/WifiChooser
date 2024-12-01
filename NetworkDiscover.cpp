@@ -10,22 +10,30 @@
 
 
 /* читщит nmcli
+ * Пользуемся тем фактом, что у нас в системе сеть управлется через NetworkMandger
+ * --wait X - заменить стд ожидание в 90 сек на Х
+ * --terse - заменить форматирование вывода на скрипточитаемое
+ * --mode multiline - выводить каждое поле на новой строке
  *
  * nmcli radio  wifi - статус вайфай
  *
  * nmcli radio wifi on/off - включить\выключить вайфай
  *
- * nmcli -g IP4.ADDRESS device show wlan0
+ * nmcli -g IP4.ADDRESS device show wlan0 - получить только значение поля IP4.ADDRESS для устройства wlan0
  *
- * nmcli device wifi connect "$SSID" password "$PASSWORD"
- * nmcli --wait 15 device wifi connect "$SSID" password "$PASSWORD"
+ * nmcli device wifi connect "$SSID" password "$PASSWORD" - подклбчиться к указанной сети с переданным паролем
  *
- * nmcli connection show --active
- * nmcli --field TYPE,NAME connection show --active
+ * nmcli connection show --active - список активных соединений
+ * nmcli --field TYPE,NAME connection show --active оно же с указанием желаемых полей
  *
- * nmcli --field SSID device wifi
- * nmcli --field SSID,IN-USE device wifi
- * nmcli --field SSID,IN-USE --mode multiline device wifi
+ *  nmcli --field SSID,IN-USE device wifi - вывод доступных wifi-соединений с указанными полями
+ * весь консольный вывод команды,
+ * SSID,IN-USE - обязательные заголовоки полей, значения полей разделены : из-за --terse,
+ * NET1: - имена сетей
+ * NET2:* - подключенная сеть
+ * ...
+ * NETn:
+
  * */
 
 NetworkControl::NetworkControl(QObject* parent)
@@ -49,27 +57,10 @@ QStringList NetworkControl::availableWiFiNets() const
 void NetworkControl::updateWiFiInfo()
 {
     m_availableWiFiNets.clear();
-    /*nmcli --field SSID device wifi
-     * Пользуемся тем фактом, что у нас в системе сеть управлется через NetworkMandger
-     * */
-    // запускаем желаемую команду
 
-    //ожидаем выполнения (5 сек максимум)
-
-    /*считываем весь консольный вывод команды, что-то типа
-     * SSID - обязательный заголовок поля
-     * NET1 - имена сетей
-     * NET2
-     * ...
-     * NETn
-     * */
     QString consoleString = nmcliCommand(QStringList() << "--terse" << "--field" << "SSID,IN-USE" << "device" << "wifi",
                                          5000);
-    // QString consoleString = nmcliCommand( QStringList() << "--field" << "SSID" << "device" << "wifi" << "list" << "--rescan" << "yes",
-    //                                                            5000);
     m_activeSsidIdx = -1;
-
-    // QStringList separatedNames = consoleString.split('\n');
 
     QStringList wifiList = consoleString.split('\n');
 
@@ -82,37 +73,24 @@ void NetworkControl::updateWiFiInfo()
     }
 
     emit availableWiFiNetsChanged();
-
-
-    // foreach (const QString& name, separatedNames) {
-    //     if (name.isEmpty())
-    //         continue;
-    //     const QString& nameTrim = name.trimmed();
-    //     if (nameTrim != "SSID")
-    //         m_availableWiFiNets.append(nameTrim);
-
-    // }
-
 }
 
 bool NetworkControl::tryConnect(int idx, const QString &pass)
 {
-    //nmcli --wait 5 device wifi connect SSID_or_BSSID password password
-
     if (idx < 0 || idx >= m_availableWiFiNets.size())
         return false;
     m_currentIp = "-----";
+
     //защита от пробелов в имени
-    QString ssid_name = QString("%1").arg(m_availableWiFiNets.at(idx));
-    // list << "device" << "wifi" << "connect" << ssid_name.toStdString().c_str() << "password" << pass.toStdString().c_str();
-    QString consoleString = nmcliCommand(QStringList() << "--wait" << "5" << "device" << "wifi" << "connect" << ssid_name.toStdString().c_str() << "password" << pass.toStdString().c_str(),
+    QString ssid_name = QString("'%1'").arg(m_availableWiFiNets.at(idx));
+    QString passWrapped = QString("'%1'").arg(pass);
+
+    QString consoleString = nmcliCommand(QStringList() << "--wait" << "5" << "device" << "wifi" << "connect" << ssid_name.toStdString().c_str() << "password" << passWrapped.toStdString().c_str(),
                                          5500);
-    qDebug() << "connect" << ssid_name.toStdString().c_str() << "password" << pass.toStdString().c_str();
     if (consoleString.contains("Ошибка")) {
         m_currentIp = "0";
         return false;
     }
-    // checkIpAddrOnWlan0();
     updateWiFiInfo();
     return true;
 }
@@ -142,14 +120,12 @@ void NetworkControl::checkWifiState()
 
 void NetworkControl::setWifiEnabledState(bool enable)
 {
-    //ожидаем выполнения (0.5 сек максимум)
     nmcliCommand(QStringList() << "radio" << "wifi" << (enable ? "on" : "off"),
                  500);
 }
 
 void NetworkControl::checkIpAddrOnWlan0()
 {
-    // nmcli -g IP4.ADDRESS device show wlan0
     //Исключетельно устройств-зависимый код. Но мы гарантированно знаем название устройства wifi в системе и этим пользуемся
     //ожидаем выполнения (0.5 сек максимум)
     QString consoleString = nmcliCommand(QStringList() << "-g" << "IP4.ADDRESS" << "device" << "show" << "wlan0",
@@ -157,28 +133,6 @@ void NetworkControl::checkIpAddrOnWlan0()
     if (m_currentIp != consoleString) {
         m_currentIp = consoleString;
         emit currentIpChanged();
-    }
-}
-
-void NetworkControl::checkActiveSsid()
-{
-    // nmcli --field SSID,IN-USE device wifi | grep '*'
-    QString consoleString = nmcliCommand(QStringList() << "--terse" << "--field" << "SSID,IN-USE" << "device" << "wifi",
-                                         5000);
-    if (consoleString.isEmpty()) {
-        m_activeSsidIdx = -1;
-        return;
-    }
-
-
-    QStringList wifiList = consoleString.split('\n');
-    for (int idx = 0; idx < wifiList.size(); ++idx) {
-        QStringList check = wifiList.at(idx).split(':');
-        if (check.size() >1 && check.at(1).contains('*')) {
-            m_activeSsidIdx = idx;
-            emit activeSsidIdxChanged();
-            return;
-        }
     }
 }
 
@@ -230,7 +184,3 @@ int NetworkControl::activeSsidIdx() const
     return m_activeSsidIdx;
 }
 
-QVariantList NetworkControl::visibleWifiNets() const
-{
-    return m_visibleWifiNets;
-}

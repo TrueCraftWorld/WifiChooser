@@ -87,6 +87,10 @@ signals:
      * @brief изменился текущий IP
      */
     void currentIpChanged();
+    /**
+     * @brief сигнал об изменении индекса подключенной сети
+     */
+    void activeSsidIdxChanged();
 
 protected:
     /**

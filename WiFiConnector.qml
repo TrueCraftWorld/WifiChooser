@@ -20,9 +20,6 @@ Item {
                 ssid_selector.visible = false
             }
         }
-        onActiveSsidIdxChanged: {
-            ssid_selector.currentIndex = wifi_handle.activeSsidIdx
-        }
     }
 
     Rectangle {
