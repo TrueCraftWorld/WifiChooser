@@ -13,8 +13,10 @@ Switch {
         x: switchRoot.leftPadding
         y: parent.height / 2 - height / 2
         radius: 13
-        color: switchRoot.checked ? "#17a81a" : "#ffffff"
-        border.color: switchRoot.checked ? "#17a81a" : "#cccccc"
+        // color: switchRoot.checked ? "#17a81a" : "#ffffff"
+        color:  enabled ? "#005c9f" : "#999999"
+        // border.color: switchRoot.checked ? "#17a81a" : "#cccccc"
+        border.color:  enabled ? "#005c9f" : "#999999"
 
         Rectangle {
             x: switchRoot.checked ? parent.width - width : 0
@@ -22,7 +24,7 @@ Switch {
             height: 26
             radius: 13
             color: switchRoot.down ? "#cccccc" : "#ffffff"
-            border.color: switchRoot.checked ? (switchRoot.down ? "#17a81a" : "#21be2b") : "#999999"
+            border.color: switchRoot.checked ? ("#005c9f") : "#999999"
         }
     }
 
@@ -30,7 +32,9 @@ Switch {
         text: switchRoot.text
         font: switchRoot.font
         opacity: enabled ? 1.0 : 0.3
-        color: switchRoot.down ? "#17a81a" : "#21be2b"
+        // color: switchRoot.down ? "#17a81a" : "#21be2b"
+        color: "white"
+        // font.bold: true
         verticalAlignment: Text.AlignVCenter
         leftPadding: switchRoot.indicator.width + switchRoot.spacing
     }

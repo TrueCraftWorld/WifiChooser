@@ -10,6 +10,7 @@ Item {
         id: wifi_handle
         onAvailableWiFiNetsChanged: {
             ssid_selector.model = wifi_handle.availableWiFiNets
+            ssid_selector.currentIndex = wifi_handle.activeSsidIdx
         }
         onWifiStateChanged: {
             if (wifi_handle.wifiState) {
@@ -18,6 +19,9 @@ Item {
             } else {
                 ssid_selector.visible = false
             }
+        }
+        onActiveSsidIdxChanged: {
+            ssid_selector.currentIndex = wifi_handle.activeSsidIdx
         }
     }
 
@@ -33,6 +37,8 @@ Item {
         Text {
             anchors.fill: parent
             horizontalAlignment: Text.AlignHCenter
+            verticalAlignment: Text.AlignVCenter
+            // font.bold: true
             color: "black"
             text: qsTr("Настройки сети")
         }
@@ -66,6 +72,8 @@ Item {
             Text {
                 anchors.fill: parent
                 horizontalAlignment: Text.AlignHCenter
+                verticalAlignment: Text.AlignVCenter
+                // font.bold: true
                 color: "white"
                 text: qsTr("Доступные Wi-Fi сети")
             }

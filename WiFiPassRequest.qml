@@ -4,12 +4,17 @@ import QtQuick.Controls 2.15
 Rectangle {
     id: pass_req_root
     width: 600
-    height: 400
+    height: 300
     radius: 10
     opacity: 1
     property string ssid_name
     signal passwordAccepted(password: string)
     signal destroyMe()
+    anchors {
+        top: parent.top
+        topMargin: 50
+        horizontalCenter: parent.horizontalCenter
+    }
 
     Text {
         id: pass_req_title
@@ -18,16 +23,18 @@ Rectangle {
         anchors {
             left: parent.left
             top: parent.top
-            topMargin: 5
+            topMargin: 15
             horizontalCenter: parent.horizontalCenter
         }
+        horizontalAlignment: Text.AlignHCenter
+        verticalAlignment: Text.AlignVCenter
         text: qsTr("ВВЕДИТЕ ПАРОЛЬ")
     }
 
     Rectangle {
         id: pass_req_ssid
         width: parent.width * .8
-        height: 100
+        height: 45
         radius: 8
         anchors {
             top: pass_req_title.bottom
@@ -38,12 +45,13 @@ Rectangle {
             anchors.fill: parent
             text: "SSID: " + ssid_name
             anchors.leftMargin: 15
+            verticalAlignment: Text.AlignVCenter
         }
     }
     Rectangle {
         id: pass_req_pswd
         width: parent.width * .8
-        height: 100
+        height: 45
         radius: 8
         anchors {
             top: pass_req_ssid.bottom
@@ -54,16 +62,19 @@ Rectangle {
             id: passwd_text
             anchors.fill: parent
             anchors.leftMargin: 15
+            verticalAlignment: Text.AlignVCenter
+            echoMode: TextInput.Password
         }
     }
-    Button {
+    StyledButton {
         id: pass_req_accept_button
-        width: parent.width * .8
-        height: 20
+        width: parent.width * .35
+        height: 45
         anchors {
             top: pass_req_pswd.bottom
-            topMargin: 10
-            horizontalCenter: parent.horizontalCenter
+            topMargin: 20
+            left: parent.left
+            leftMargin: parent.width * .1
         }
         Text {
             anchors.centerIn: parent
@@ -73,14 +84,15 @@ Rectangle {
             passwordAccepted(passwd_text.text)
         }
     }
-    Button {
+    StyledButton {
         id: pass_req_cancel_button
-        width: parent.width * .8
-        height: 20
+        width: parent.width * .35
+        height: 45
         anchors {
-            top: pass_req_accept_button.bottom
-            topMargin: 10
-            horizontalCenter: parent.horizontalCenter
+            top: pass_req_pswd.bottom
+            topMargin: 20
+            right: parent.right
+            rightMargin: parent.width * .1
         }
         Text {
             anchors.centerIn: parent

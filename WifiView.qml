@@ -38,7 +38,7 @@ ListView {
 
     spacing: 5
 
-    header: headerComponent
+    // header: headerComponent
     clip: true
 
 
@@ -50,8 +50,9 @@ ListView {
         property bool isCurrent: ListView.isCurrentItem
 
 
-        border.color: "darkblue"
-        color: /*isCurrent ? "#157efb":*/"#53d769"
+        border.color: "#005c9f"
+        // color:  "#005c9f"
+        color: isCurrent ? "#005c9f":"#d8d8d8"
         radius: 10
 
         anchors.margins: 20
@@ -61,6 +62,7 @@ ListView {
             id: ssid_string
             anchors.centerIn: parent
             text: parent.modelData
+            color: isCurrent ? "white":"black"
         }
 
         TapHandler {

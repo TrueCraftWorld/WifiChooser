@@ -37,7 +37,7 @@ NetworkControl::NetworkControl(QObject* parent)
 
         updateWiFiInfo();
     }
-    startTimer(5000);
+    startTimer(10000);
     m_availableWiFiNets.clear();
 }
 
@@ -63,18 +63,36 @@ void NetworkControl::updateWiFiInfo()
      * ...
      * NETn
      * */
-    QString consoleString = nmcliCommand( QStringList() << "--field" << "SSID" << "device" << "wifi" << "list" << "--rescan" << "yes",
-                                                               5000);
-    QStringList separatedNames = consoleString.split('\n');
-    foreach (const QString& name, separatedNames) {
-        if (name.isEmpty())
-            continue;
-        const QString& nameTrim = name.trimmed();
-        if (nameTrim != "SSID")
-            m_availableWiFiNets.append(nameTrim);
+    QString consoleString = nmcliCommand(QStringList() << "--terse" << "--field" << "SSID,IN-USE" << "device" << "wifi",
+                                         5000);
+    // QString consoleString = nmcliCommand( QStringList() << "--field" << "SSID" << "device" << "wifi" << "list" << "--rescan" << "yes",
+    //                                                            5000);
+    m_activeSsidIdx = -1;
 
+    // QStringList separatedNames = consoleString.split('\n');
+
+    QStringList wifiList = consoleString.split('\n');
+
+    for (int idx = 0; idx < wifiList.size(); ++idx) {
+        QStringList check = wifiList.at(idx).split(':');
+        if (check.size() > 1 && check.at(1).contains('*')) {
+            m_activeSsidIdx = idx;
+        }
+        m_availableWiFiNets.append(check.at(0));
     }
+
     emit availableWiFiNetsChanged();
+
+
+    // foreach (const QString& name, separatedNames) {
+    //     if (name.isEmpty())
+    //         continue;
+    //     const QString& nameTrim = name.trimmed();
+    //     if (nameTrim != "SSID")
+    //         m_availableWiFiNets.append(nameTrim);
+
+    // }
+
 }
 
 bool NetworkControl::tryConnect(int idx, const QString &pass)
@@ -87,14 +105,15 @@ bool NetworkControl::tryConnect(int idx, const QString &pass)
     //защита от пробелов в имени
     QString ssid_name = QString("%1").arg(m_availableWiFiNets.at(idx));
     // list << "device" << "wifi" << "connect" << ssid_name.toStdString().c_str() << "password" << pass.toStdString().c_str();
-    QString consoleString = nmcliCommand(QStringList() << "--wait" << "50" << "device" << "wifi" << "connect" << ssid_name.toStdString().c_str() << "password" << pass.toStdString().c_str(),
-                                         50500);
+    QString consoleString = nmcliCommand(QStringList() << "--wait" << "5" << "device" << "wifi" << "connect" << ssid_name.toStdString().c_str() << "password" << pass.toStdString().c_str(),
+                                         5500);
     qDebug() << "connect" << ssid_name.toStdString().c_str() << "password" << pass.toStdString().c_str();
     if (consoleString.contains("Ошибка")) {
         m_currentIp = "0";
         return false;
     }
     // checkIpAddrOnWlan0();
+    updateWiFiInfo();
     return true;
 }
 
@@ -141,6 +160,28 @@ void NetworkControl::checkIpAddrOnWlan0()
     }
 }
 
+void NetworkControl::checkActiveSsid()
+{
+    // nmcli --field SSID,IN-USE device wifi | grep '*'
+    QString consoleString = nmcliCommand(QStringList() << "--terse" << "--field" << "SSID,IN-USE" << "device" << "wifi",
+                                         5000);
+    if (consoleString.isEmpty()) {
+        m_activeSsidIdx = -1;
+        return;
+    }
+
+
+    QStringList wifiList = consoleString.split('\n');
+    for (int idx = 0; idx < wifiList.size(); ++idx) {
+        QStringList check = wifiList.at(idx).split(':');
+        if (check.size() >1 && check.at(1).contains('*')) {
+            m_activeSsidIdx = idx;
+            emit activeSsidIdxChanged();
+            return;
+        }
+    }
+}
+
 QString NetworkControl::nmcliCommand(const QStringList &command, int msecTimeout)
 {
     if (msecTimeout < 0)
@@ -178,6 +219,18 @@ void NetworkControl::timerEvent(QTimerEvent */*event*/)
 {
     checkWifiState();
     checkIpAddrOnWlan0();
+    if (m_wifiState)
+        updateWiFiInfo();
 }
 
 
+
+int NetworkControl::activeSsidIdx() const
+{
+    return m_activeSsidIdx;
+}
+
+QVariantList NetworkControl::visibleWifiNets() const
+{
+    return m_visibleWifiNets;
+}
