@@ -57,7 +57,7 @@ Item
     {
         target: control.target
         enabled: control.enabled
-        onVerticalOvershootChanged:
+        function onVerticalOvershootChanged()
         {
             if (!control.target.verticalOvershoot)
             {

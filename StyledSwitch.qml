@@ -14,7 +14,7 @@ Switch {
         y: parent.height / 2 - height / 2
         radius: 13
         // color: switchRoot.checked ? "#17a81a" : "#ffffff"
-        color:  enabled ? "#005c9f" : "#999999"
+        color:  switchRoot.checked ? "#005c9f" : "#999999"
         // border.color: switchRoot.checked ? "#17a81a" : "#cccccc"
         border.color:  enabled ? "#005c9f" : "#999999"
 

@@ -4,7 +4,9 @@
 #include <QQmlContext>
 #include <QDebug>
 #include <QNetworkInterface>
-#include <QTimer>
+
+#include <QtConcurrent>
+
 
 #include <string>
 
@@ -36,17 +38,39 @@
 
  * */
 
+namespace  {
+QString nmcliCommand(CommPtr command)
+{
+    if (command.isNull())
+        return QString();
+    if (command->msecTimeout < 0)
+        command->msecTimeout =100;
+    QProcess process;
+    process.start("nmcli", command->commandLine);
+    process.waitForFinished(command->msecTimeout);
+    if (process.state() == QProcess::Running){
+        process.terminate();
+    }
+    return QString(process.readAllStandardOutput()).trimmed();
+}
+}
+
 NetworkControl::NetworkControl(QObject* parent)
     : QObject(parent)
 {
     QQmlEngine::setObjectOwnership(this, QQmlEngine::CppOwnership);
-    checkWifiState();
-    if (m_wifiState) {
+    connect(&m_watcher, &QFutureWatcher<int>::finished, this, &NetworkControl::slotHandleNmcliResponse);
+    connect(&m_timer, &QTimer::timeout, this, &NetworkControl::slotLaunchNextCommand);
 
-        updateWiFiInfo();
-    }
+    checkWifiState();
+    updateWiFiInfo();
+
+    m_timer.start(300); ///ну за глаза учитывая, что nmcli штука не быстрая
+    // if (m_wifiState) {
+
+    // }
     startTimer(10000);
-    m_availableWiFiNets.clear();
+    // m_availableWiFiNets.clear();
 }
 
 QStringList NetworkControl::availableWiFiNets() const
@@ -56,8 +80,13 @@ QStringList NetworkControl::availableWiFiNets() const
 
 void NetworkControl::updateWiFiInfo()
 {
-    m_availableWiFiNets.clear();
 
+    CommPtr ptr (new Command(QStringList() << "--terse" << "--field" << "SSID,IN-USE" << "device" << "wifi",
+                            Command::comCheckVisibleNetworks,
+                            5000));
+    addCommand(ptr);
+    m_availableWiFiNets.clear();
+/*
     QString consoleString = nmcliCommand(QStringList() << "--terse" << "--field" << "SSID,IN-USE" << "device" << "wifi",
                                          5000);
     m_activeSsidIdx = -1;
@@ -73,25 +102,31 @@ void NetworkControl::updateWiFiInfo()
     }
 
     emit availableWiFiNetsChanged();
+*/
 }
 
 bool NetworkControl::tryConnect(int idx, const QString &pass)
 {
     if (idx < 0 || idx >= m_availableWiFiNets.size())
         return false;
-    m_currentIp = "-----";
 
     //защита от пробелов в имени
-    QString ssid_name = QString("'%1'").arg(m_availableWiFiNets.at(idx));
-    QString passWrapped = QString("'%1'").arg(pass);
-
+    QString ssid_name = QString("%1").arg(m_availableWiFiNets.at(idx));
+    QString passWrapped = QString("%1").arg(pass);
+    CommPtr ptr (new Command(QStringList() << "--wait" << "5" << "device" << "wifi" << "connect" << ssid_name.toStdString().c_str() << "password" << passWrapped.toStdString().c_str(),
+                             Command::comConnectWifi,
+                             5500));
+    addCommand(ptr);
+/*
     QString consoleString = nmcliCommand(QStringList() << "--wait" << "5" << "device" << "wifi" << "connect" << ssid_name.toStdString().c_str() << "password" << passWrapped.toStdString().c_str(),
                                          5500);
+    m_currentIp = "-----";
     if (consoleString.contains("Ошибка")) {
         m_currentIp = "0";
         return false;
     }
     updateWiFiInfo();
+*/
     return true;
 }
 
@@ -102,51 +137,45 @@ void NetworkControl::registerNetworkControl()
 
 void NetworkControl::checkWifiState()
 {
-    QString consoleString = nmcliCommand(QStringList()  << "radio" << "wifi",
-                                 500);
-    bool newState = m_wifiState;
-    if (consoleString.contains("enabled")) {
-        newState = true;
-        checkIpAddrOnWlan0();
-    } else if (consoleString.contains("disabled")) {
-        newState = false;
-    }
-
-    if (m_wifiState != newState) {
-        m_wifiState = newState;
-        emit wifiStateChanged();
-    }
+    CommPtr ptr (new Command(QStringList()  << "radio" << "wifi",
+                            Command::comCheckWifi,
+                            500));
+    addCommand(ptr);
 }
 
 void NetworkControl::setWifiEnabledState(bool enable)
 {
-    nmcliCommand(QStringList() << "radio" << "wifi" << (enable ? "on" : "off"),
-                 500);
+    CommPtr ptr (new Command(QStringList() << "radio" << "wifi" << (enable ? "on" : "off"),
+                            Command::comSetWifi,
+                            500));
+    addCommand(ptr);
 }
 
 void NetworkControl::checkIpAddrOnWlan0()
 {
     //Исключетельно устройств-зависимый код. Но мы гарантированно знаем название устройства wifi в системе и этим пользуемся
     //ожидаем выполнения (0.5 сек максимум)
-    QString consoleString = nmcliCommand(QStringList() << "-g" << "IP4.ADDRESS" << "device" << "show" << "wlan0",
-                                         500);
-    if (m_currentIp != consoleString) {
-        m_currentIp = consoleString;
-        emit currentIpChanged();
-    }
+    CommPtr ptr (new Command(QStringList() << "-g" << "IP4.ADDRESS" << "device" << "show" << "wlan0",
+                            Command::comGetIp,
+                            500));
+    addCommand(ptr);
 }
 
-QString NetworkControl::nmcliCommand(const QStringList &command, int msecTimeout)
+void NetworkControl::addCommand(CommPtr command, bool isUrgent)
 {
-    if (msecTimeout < 0)
-        msecTimeout =100;
-    QProcess process;
-    process.start("nmcli", command);
-    process.waitForFinished(msecTimeout);
-    if (process.state() == QProcess::Running){
-        process.terminate();
-    }
-    return QString(process.readAllStandardOutput()).trimmed();
+    if (isUrgent)
+        m_commandQueue.clear();
+    m_commandQueue.enqueue(command);
+}
+
+void NetworkControl::slotLaunchNextCommand()
+{
+    if (m_watcher.isRunning() || m_commandQueue.empty() || !m_currentCommand.isNull())
+        return;
+
+    m_currentCommand = m_commandQueue.dequeue();
+    QFuture<QString> future = QtConcurrent::run(nmcliCommand, m_currentCommand);
+    m_watcher.setFuture(future);
 }
 
 bool NetworkControl::wifiState() const
@@ -158,9 +187,7 @@ void NetworkControl::setWifiState(bool enable)
 {
     setWifiEnabledState(enable);
     checkWifiState();
-    if (m_wifiState) {
-        updateWiFiInfo();
-    }
+    updateWiFiInfo();
     checkIpAddrOnWlan0();
 }
 
@@ -173,8 +200,74 @@ void NetworkControl::timerEvent(QTimerEvent */*event*/)
 {
     checkWifiState();
     checkIpAddrOnWlan0();
-    if (m_wifiState)
-        updateWiFiInfo();
+    updateWiFiInfo();
+}
+
+void NetworkControl::slotHandleNmcliResponse()
+{
+    QString response = m_watcher.future();
+
+    switch (m_currentCommand->type) {
+    case Command::comCheckVisibleNetworks:
+    {
+        m_availableWiFiNets.clear();
+        m_activeSsidIdx = -1;
+        QStringList wifiList = response.split('\n');
+
+        for (int idx = 0; idx < wifiList.size(); ++idx) {
+            QStringList check = wifiList.at(idx).split(':');
+            if (check.size() > 1 && check.at(1).contains('*')) {
+                m_activeSsidIdx = idx;
+            }
+            m_availableWiFiNets.append(check.at(0));
+        }
+        emit availableWiFiNetsChanged();
+    }
+        break;
+    case Command::comCheckWifi:
+    {
+        bool newState = m_wifiState;
+        if (response.contains("enabled")) {
+            newState = true;
+            checkIpAddrOnWlan0();
+        } else if (response.contains("disabled")) {
+            newState = false;
+        }
+
+        if (m_wifiState != newState) {
+            m_wifiState = newState;
+            emit wifiStateChanged();
+        }
+    }
+        break;
+    case Command::comConnectWifi:
+    {
+        m_currentIp = "-----";
+        bool res = true;
+        if (response.contains("Ошибка")) {
+            m_currentIp = "0";
+            res = false;
+            // break;
+        }
+        emit commandFinished(res);
+        // updateWiFiInfo();
+    }
+        break;
+    case Command::comGetIp:
+    {
+        if (m_currentIp != response) {
+            m_currentIp = response;
+            emit currentIpChanged();
+        }
+    }
+        break;
+    case Command::comSetWifi:
+        ///nothing to check
+        break;
+    default:
+        break;
+    }
+    m_currentCommand.reset();
 }
 
 
@@ -184,3 +277,8 @@ int NetworkControl::activeSsidIdx() const
     return m_activeSsidIdx;
 }
 
+
+bool Command::empty() const
+{
+    return isEmpty;
+}

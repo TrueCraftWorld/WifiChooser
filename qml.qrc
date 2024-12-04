@@ -6,5 +6,6 @@
         <file>WiFiConnector.qml</file>
         <file>StyledSwitch.qml</file>
         <file>StyledButton.qml</file>
+        <file>StyledBusyIndicator.qml</file>
     </qresource>
 </RCC>

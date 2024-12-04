@@ -5,7 +5,50 @@
 #include <QObject>
 
 #include <QQmlEngine>
+#include <QQueue>
+#include <QTimer>
+#include <QFutureWatcher>
+#include <QSharedPointer>
 
+struct Command
+{
+    enum commandType {
+        comCheckWifi= 0,
+        comSetWifi,
+        comCheckVisibleNetworks,
+        comGetIp,
+        comConnectWifi
+    };
+
+    Command(const QStringList & _commandLine,
+            const commandType & _type,
+            int _msecTimeout = 500) :
+        commandLine(_commandLine),
+        msecTimeout(_msecTimeout),
+        type(_type),
+        isEmpty(false)
+    {}
+
+    Command(const Command& src) {
+        commandLine = src.commandLine;
+        msecTimeout = src.msecTimeout;
+        type = src.type;
+        isEmpty = false;
+    }
+
+    bool empty() const;
+    void clear() {
+        commandLine.clear();
+        isEmpty = true;
+    }
+
+    QStringList commandLine;
+    int msecTimeout;
+    commandType type;
+    bool isEmpty;
+};
+
+using CommPtr = QSharedPointer<Command>;
 
 /**
  * @brief The NetworkControl class
@@ -92,6 +135,8 @@ signals:
      */
     void activeSsidIdxChanged();
 
+    void commandFinished(bool res);
+
 protected:
     /**
      * @brief Обработка событий внутреннего таймер QObject
@@ -100,6 +145,12 @@ protected:
      *
      */
     void timerEvent(QTimerEvent *) override;
+
+private slots:
+
+    void slotHandleNmcliResponse();
+
+    void slotLaunchNextCommand();
 
 private:
     /**
@@ -124,12 +175,18 @@ private:
      * @param msecTimeout максимальное время ожидания завершения команды
      * @return
      */
-    QString nmcliCommand(const QStringList& command, int msecTimeout);
+
+    void addCommand(CommPtr command, bool isUrgent = false);
+
 
     QStringList m_availableWiFiNets; ///<
     bool m_wifiState; ///<
     QString m_currentIp = ""; ///<
     int m_activeSsidIdx; ///<
+    QQueue<CommPtr> m_commandQueue;
+    CommPtr m_currentCommand;
+    QTimer m_timer;
+    QFutureWatcher<QString> m_watcher;
 };
 
 #endif // NETWORKDISCOVER_H

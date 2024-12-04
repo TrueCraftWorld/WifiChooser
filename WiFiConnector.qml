@@ -20,6 +20,9 @@ Item {
                 ssid_selector.visible = false
             }
         }
+        onCommandFinished: {
+            wifi_busy.running = false;
+        }
     }
 
     Rectangle {
@@ -80,6 +83,7 @@ Item {
             id: ssid_selector
             height: viewContainer.height
             model: wifi_handle.availableWiFiNets
+            enabled: !wifi_busy.running
             anchors {
                 top: ssid_selector_title.bottom
                 bottom: parent.bottom
@@ -165,6 +169,12 @@ Item {
             color: "white"
             text: wifi_handle.currentIp
         }
+        StyledBusyIndicator {
+            id: wifi_busy
+            running: false
+            anchors.fill: parent
+
+        }
 
     }
 
@@ -172,6 +182,7 @@ Item {
         target: ssid_selector
         function onNetworkChosen(idx: int, passwd: string) {
             wifi_handle.tryConnect(idx, passwd)
+            wifi_busy.running = true;
         }
         function onUpdateMe() {
             wifi_handle.updateWiFiInfo()
