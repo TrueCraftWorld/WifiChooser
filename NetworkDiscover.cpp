@@ -69,7 +69,7 @@ NetworkControl::NetworkControl(QObject* parent)
     // if (m_wifiState) {
 
     // }
-    startTimer(10000);
+    startTimer(5000);
     // m_availableWiFiNets.clear();
 }
 
@@ -250,6 +250,10 @@ void NetworkControl::slotHandleNmcliResponse()
             // break;
         }
         emit commandFinished(res);
+        if (res) {
+            updateWiFiInfo();
+            checkIpAddrOnWlan0();
+        }
         // updateWiFiInfo();
     }
         break;
