@@ -19,6 +19,7 @@ Item {
             } else {
                 ssid_selector.visible = false
             }
+            wifi_busy.running = false;
         }
         onCommandFinished: {
             wifi_busy.running = false;
