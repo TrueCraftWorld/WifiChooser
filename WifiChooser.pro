@@ -11,7 +11,8 @@ CONFIG += disable-desktop
 
 SOURCES += \
         NetworkDiscover.cpp \
-        main.cpp
+        main.cpp \
+        updateclient.cpp
 
 RESOURCES += qml.qrc
 
@@ -33,4 +34,7 @@ target.path = /usr/share/qtpr
 INSTALLS += target
 
 HEADERS += \
-    NetworkDiscover.h
+    NetworkDiscover.h \
+    package.h \
+    protocolcommand.h \
+    updateclient.h

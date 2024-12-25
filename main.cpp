@@ -3,6 +3,7 @@
 #include <QQmlContext>
 
 #include "NetworkDiscover.h"
+#include "updateclient.h"
 
 int main(int argc, char *argv[])
 {
@@ -13,6 +14,7 @@ int main(int argc, char *argv[])
     QGuiApplication app(argc, argv);
 
     NetworkControl::registerNetworkControl();
+    UpdateClient::registerUpdateClient();
 
     QQmlApplicationEngine engine;
 

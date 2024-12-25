@@ -25,6 +25,9 @@ Item {
             wifi_busy.running = false;
         }
     }
+    UpdateClient {
+        id: update_handle
+    }
 
     Rectangle {
         id: topStatus
@@ -170,11 +173,27 @@ Item {
             color: "white"
             text: wifi_handle.currentIp
         }
+        Button {
+            id: update_request
+
+            width: 150
+            height: 50
+            anchors {
+                horizontalCenter: parent.horizontalCenter
+                top: ip_text.bottom
+                topMargin: 45
+            }
+            onClicked: {
+                console.log("update_press")
+                update_handle.requestUpdate()
+
+            }
+        }
+
         StyledBusyIndicator {
             id: wifi_busy
             running: false
             anchors.fill: parent
-
         }
 
     }
