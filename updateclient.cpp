@@ -7,6 +7,7 @@
 #include <QFileInfo>
 #include "protocolcommand.h"
 #include "package.h"
+#include "updateConfig.h"
 
 UpdateClient::UpdateClient( QObject *parent)
     : QObject(parent)
@@ -16,9 +17,9 @@ UpdateClient::UpdateClient( QObject *parent)
     flag = false;
     SYNFlag = 0;
     DOWNFlag = 0;
-    /*文件发送相关初始化*/
-    data.payloadSize = 64*1024;  //每次发送64kb
 
+    data.payloadSize = 64*1024;
+    data.localFile = nullptr;
     data.bytesWritten = 0;
     data.bytesToWrite = 0;
 
@@ -31,7 +32,7 @@ void UpdateClient::requestUpdate()
     qDebug() << "request Update";
     updateSocket = new QTcpSocket(this);
 
-    QHostAddress updateHost("192.168.1.202");
+    QHostAddress updateHost(UPDATE_SERV_IP);
 
     connect(updateSocket, &QTcpSocket::connected, this, [this](){
         headerReaded=false;
@@ -100,11 +101,12 @@ void UpdateClient::receiveFile()
             }
             tempFileName += data.fileName;
             qDebug()<<tempFileName;
-            data.localFile = new QFile(tempFileName);
-            if(!data.localFile->open(QFile::WriteOnly))
-            {
-                qDebug()<<"open local file error!";
-                return;
+            if (!data.localFile || !data.localFile->isOpen()) {
+                data.localFile = new QFile(tempFileName);
+                if(!data.localFile->open(QFile::WriteOnly)) {
+                    qDebug()<<"open local file error!";
+                    return;
+                }
             }
         }
     }

@@ -26,9 +26,9 @@ private:
 private:
     TransferData data;
 
-    bool flag;                      //是否可以同步目录列表，true可是同步，false不可以
-    int SYNFlag;                //请求文件同步标志位
-    int DOWNFlag;               //下载文件标志位
+    bool flag;
+    int SYNFlag;
+    int DOWNFlag;
     QString tempFileName;
 
     int bytesAwaited= -1;

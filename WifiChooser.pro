@@ -37,4 +37,5 @@ HEADERS += \
     NetworkDiscover.h \
     package.h \
     protocolcommand.h \
+    updateConfig.h \
     updateclient.h
