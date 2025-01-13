@@ -117,6 +117,17 @@ public:
     int activeSsidIdx() const;
 
 
+    /**
+     * @brief Приостанавливает обновление списка известных сетей
+     */
+    Q_INVOKABLE void suspendNetSearch();
+
+    /**
+     * @brief Приостанавливает обновление списка известных сетей
+     */
+    Q_INVOKABLE void resumeNetSearch();
+
+
 signals:
     /**
      * @brief список доступных сетей изменился
@@ -187,6 +198,7 @@ private:
     CommPtr m_currentCommand;
     QTimer m_timer;
     QFutureWatcher<QString> m_watcher;
+    bool m_searchSuspend = false;
 };
 
 #endif // NETWORKDISCOVER_H

@@ -201,8 +201,10 @@ Item {
     Connections {
         target: ssid_selector
         function onNetworkChosen(idx: int, passwd: string) {
+            wifi_handle.suspendNetSearch()
             wifi_handle.tryConnect(idx, passwd)
             wifi_busy.running = true;
+            // wifi_handle.resumeNetSearch()
         }
         function onUpdateMe() {
             wifi_handle.updateWiFiInfo()

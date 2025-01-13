@@ -19,6 +19,15 @@ ApplicationWindow {
         anchors.fill: parent
     }
 
+    Shortcut {
+        id:backShortcut
+        sequences: ["Esc"]
+
+        onActivated: {
+            root.close();
+        }
+    }
+
     InputPanel {
         id: inputPanel
 

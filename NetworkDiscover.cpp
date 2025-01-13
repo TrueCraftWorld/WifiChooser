@@ -111,11 +111,12 @@ bool NetworkControl::tryConnect(int idx, const QString &pass)
         return false;
 
     //защита от пробелов в имени
-    QString ssid_name = QString("%1").arg(m_availableWiFiNets.at(idx));
-    QString passWrapped = QString("%1").arg(pass);
+    QString ssid_name = QString("'%1'").arg(m_availableWiFiNets.at(idx));
+    QString passWrapped = QString("'%1'").arg(pass);
     CommPtr ptr (new Command(QStringList() << "--wait" << "5" << "device" << "wifi" << "connect" << ssid_name.toStdString().c_str() << "password" << passWrapped.toStdString().c_str(),
                              Command::comConnectWifi,
                              5500));
+    qDebug() <<  "--wait" << "5" << "device" << "wifi" << "connect" << ssid_name.toStdString().c_str() << "password" << passWrapped.toStdString().c_str();
     addCommand(ptr);
 /*
     QString consoleString = nmcliCommand(QStringList() << "--wait" << "5" << "device" << "wifi" << "connect" << ssid_name.toStdString().c_str() << "password" << passWrapped.toStdString().c_str(),
@@ -198,6 +199,8 @@ QString NetworkControl::currentIp() const
 
 void NetworkControl::timerEvent(QTimerEvent */*event*/)
 {
+    if (m_searchSuspend)
+        return;
     checkWifiState();
     checkIpAddrOnWlan0();
     updateWiFiInfo();
@@ -255,6 +258,7 @@ void NetworkControl::slotHandleNmcliResponse()
             checkIpAddrOnWlan0();
         }
         // updateWiFiInfo();
+        m_searchSuspend = false;
     }
         break;
     case Command::comGetIp:
@@ -279,6 +283,16 @@ void NetworkControl::slotHandleNmcliResponse()
 int NetworkControl::activeSsidIdx() const
 {
     return m_activeSsidIdx;
+}
+
+void NetworkControl::suspendNetSearch()
+{
+    m_searchSuspend = true;
+}
+
+void NetworkControl::resumeNetSearch()
+{
+    m_searchSuspend = false;
 }
 
 
