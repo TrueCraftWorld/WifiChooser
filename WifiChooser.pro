@@ -12,7 +12,8 @@ CONFIG += disable-desktop
 SOURCES += \
         NetworkDiscover.cpp \
         main.cpp \
-        updateclient.cpp
+        updateclient.cpp \
+        wifilistmodel.cpp
 
 RESOURCES += qml.qrc
 
@@ -38,4 +39,5 @@ HEADERS += \
     package.h \
     protocolcommand.h \
     updateConfig.h \
-    updateclient.h
+    updateclient.h \
+    wifilistmodel.h
