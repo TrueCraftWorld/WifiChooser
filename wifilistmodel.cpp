@@ -11,7 +11,23 @@ int WiFiListModel::rowCount(const QModelIndex &parent) const
 
 QVariant WiFiListModel::data(const QModelIndex &index, int role) const
 {
+    if (!index.isValid() || index.row() >= m_ssid.size())
+        return QVariant();
 
+    const WiFiItem& data = m_ssid.at(index.row());
+
+    switch (role) {
+    case Qt::DisplayRole:
+        return data.ssid;
+    case SsidRole:
+        return data.ssid;
+    case BssidRole:
+        return data.bssid;
+    case PresentCounterRole:
+        return data.presentCounter;
+    default:
+        return QVariant();
+    }
 }
 
 bool WiFiListModel::setData(const QModelIndex &index, const QVariant &value, int role)
@@ -19,11 +35,14 @@ bool WiFiListModel::setData(const QModelIndex &index, const QVariant &value, int
 
 }
 
-void WiFiListModel::addWiFiItem(const QString &str)
+void WiFiListModel::addWiFiItem(const WiFiItem &str)
 {
+    if (m_id.contains(str.ssid))
+        return;
     beginInsertRows(QModelIndex(), 0, 1);
-    m_ssid.prepend(str);
-    m_presentCounts.prepend(1);
+
+    m_ssid.append(str);
+    m_id[str.ssid] = 1;
     endInsertRows();
 }
 
@@ -34,14 +53,20 @@ void WiFiListModel::removeWiFiItem(int index)
     }
 
     beginRemoveRows(QModelIndex(), index, index);
+    m_id.remove(m_ssid.at(index).ssid);
     m_ssid.removeAt(index);
-    m_presentCounts.removeAt(index);
     endRemoveRows();
 }
 
 QHash<int, QByteArray> WiFiListModel::roleNames() const
 {
+    QHash<int, QByteArray> roles;
 
+    roles[SsidRole] = "ssid";
+    roles[BssidRole] = "bssid";
+    roles[PresentCounterRole] = "presentCounter";
+
+    return roles;
 }
 
 
