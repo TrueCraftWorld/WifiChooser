@@ -1,5 +1,7 @@
 #include "wifilistmodel.h"
 
+#include <QDebug>
+
 WiFiListModel::WiFiListModel(QObject *parent)
     : QAbstractListModel{parent}
 {}
@@ -18,8 +20,10 @@ QVariant WiFiListModel::data(const QModelIndex &index, int role) const
 
     switch (role) {
     case Qt::DisplayRole:
+        qDebug() << data.ssid;
         return data.ssid;
     case SsidRole:
+        qDebug() << data.ssid;
         return data.ssid;
     case BssidRole:
         return data.bssid;
@@ -30,32 +34,45 @@ QVariant WiFiListModel::data(const QModelIndex &index, int role) const
     }
 }
 
-bool WiFiListModel::setData(const QModelIndex &index, const QVariant &value, int role)
+void WiFiListModel::addWiFiItem(const QString &str)
 {
-
-}
-
-void WiFiListModel::addWiFiItem(const WiFiItem &str)
-{
-    if (m_id.contains(str.ssid))
+    if (m_id.contains(str))
         return;
     beginInsertRows(QModelIndex(), 0, 1);
+    WiFiItem item;
+    item.ssid = str;
+    item.presentCounter =1;
 
-    m_ssid.append(str);
-    m_id[str.ssid] = 1;
+    m_ssid.prepend(item);
+    m_id[str] = 0;
     endInsertRows();
 }
 
-void WiFiListModel::removeWiFiItem(int index)
+void WiFiListModel::updateWiFiList(const QStringList &currVisibleNets)
 {
-    if (index < 0 || index >= dataList.size()) {
-        return;
+    foreach (const auto& item, currVisibleNets) {
+        if (m_id.contains(item)) {
+            m_ssid[m_id.value(item)].presentCounter++;
+        } else {
+            addWiFiItem(item);
+        }
     }
 
-    beginRemoveRows(QModelIndex(), index, index);
-    m_id.remove(m_ssid.at(index).ssid);
-    m_ssid.removeAt(index);
-    endRemoveRows();
+    QList<WiFiItem>::iterator iter = m_ssid.begin();
+    int a = 0;
+    while (iter != m_ssid.end()) {
+        iter->presentCounter--;
+        if (iter->presentCounter <= 0) {
+            m_id.remove(iter->ssid);
+            beginRemoveRows(QModelIndex(), a, a);
+            iter = m_ssid.erase(iter);
+            endRemoveRows();
+        } else {
+            m_id[iter->ssid] = a;
+            a++;
+            iter++;
+        }
+    }
 }
 
 QHash<int, QByteArray> WiFiListModel::roleNames() const

@@ -9,6 +9,7 @@
 #include <QTimer>
 #include <QFutureWatcher>
 #include <QSharedPointer>
+#include "wifilistmodel.h"
 
 struct Command
 {
@@ -46,6 +47,7 @@ struct Command
     int msecTimeout;
     commandType type;
     bool isEmpty;
+
 };
 
 using CommPtr = QSharedPointer<Command>;
@@ -62,6 +64,7 @@ class NetworkControl : public QObject
     Q_PROPERTY(QString currentIp READ currentIp NOTIFY currentIpChanged FINAL)
     Q_PROPERTY(bool wifiState READ wifiState WRITE setWifiState NOTIFY wifiStateChanged FINAL)
     Q_PROPERTY(int activeSsidIdx READ activeSsidIdx NOTIFY activeSsidIdxChanged FINAL)
+    Q_PROPERTY(WiFiListModel* wifiModel READ wifiModel CONSTANT FINAL)
 
 public:
     /**
@@ -128,6 +131,13 @@ public:
     Q_INVOKABLE void resumeNetSearch();
 
 
+    // /**
+    //  * @brief Передаёт указатель на модель
+    //  */
+    // Q_INVOKABLE const WiFiListModel& wifiList();
+
+    WiFiListModel *wifiModel() const;
+
 signals:
     /**
      * @brief список доступных сетей изменился
@@ -189,7 +199,7 @@ private:
 
     void addCommand(CommPtr command, bool isUrgent = false);
 
-
+    WiFiListModel* m_model = nullptr;
     QStringList m_availableWiFiNets; ///<
     bool m_wifiState; ///<
     QString m_currentIp = ""; ///<
@@ -199,6 +209,7 @@ private:
     QTimer m_timer;
     QFutureWatcher<QString> m_watcher;
     bool m_searchSuspend = false;
+    // WiFiListModel *m_wifiModel = nullptr;
 };
 
 #endif // NETWORKDISCOVER_H

@@ -59,6 +59,11 @@ NetworkControl::NetworkControl(QObject* parent)
     : QObject(parent)
 {
     QQmlEngine::setObjectOwnership(this, QQmlEngine::CppOwnership);
+
+    m_model = new WiFiListModel(this);
+
+    QQmlEngine::setObjectOwnership(m_model, QQmlEngine::CppOwnership);
+
     connect(&m_watcher, &QFutureWatcher<int>::finished, this, &NetworkControl::slotHandleNmcliResponse);
     connect(&m_timer, &QTimer::timeout, this, &NetworkControl::slotLaunchNextCommand);
 
@@ -85,7 +90,7 @@ void NetworkControl::updateWiFiInfo()
                             Command::comCheckVisibleNetworks,
                             5000));
     addCommand(ptr);
-    m_availableWiFiNets.clear();
+    // m_availableWiFiNets.clear();
 /*
     QString consoleString = nmcliCommand(QStringList() << "--terse" << "--field" << "SSID,IN-USE" << "device" << "wifi",
                                          5000);
@@ -134,6 +139,7 @@ bool NetworkControl::tryConnect(int idx, const QString &pass)
 void NetworkControl::registerNetworkControl()
 {
     qmlRegisterType<NetworkControl>("BackEnd", 1, 0, "NetworkSearch");
+    qmlRegisterType<WiFiListModel>("BackEnd", 1, 0, "WiFiModel");
 }
 
 void NetworkControl::checkWifiState()
@@ -224,7 +230,8 @@ void NetworkControl::slotHandleNmcliResponse()
             }
             m_availableWiFiNets.append(check.at(0));
         }
-        emit availableWiFiNetsChanged();
+        m_model->updateWiFiList(m_availableWiFiNets);
+        // emit availableWiFiNetsChanged();
     }
         break;
     case Command::comCheckWifi:
@@ -295,8 +302,19 @@ void NetworkControl::resumeNetSearch()
     m_searchSuspend = false;
 }
 
+// const QAbstractListModel *NetworkControl::wifiList()
+// {
+//     const QAbstractListModel * ptr = &m_model;
+//     return ptr;
+// }
+
 
 bool Command::empty() const
 {
     return isEmpty;
+}
+
+WiFiListModel *NetworkControl::wifiModel() const
+{
+    return m_model;
 }

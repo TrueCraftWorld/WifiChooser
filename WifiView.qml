@@ -4,7 +4,7 @@ import com.melije.pulltorefresh 2.0
 ListView {
     id: wifi_view
     width: parent.width * .9
-    required model
+    // required model
     property var passwordPopUp: null
     property int requstedSsidIdx;
     signal networkChosen(id: int, passwd: string)
@@ -45,7 +45,7 @@ ListView {
     delegate: Rectangle {
         id: wifi_deledgate
 
-        required property string modelData
+        required property string ssid
         property var view: ListView.view
         property bool isCurrent: ListView.isCurrentItem
 
@@ -61,7 +61,7 @@ ListView {
         Text {
             id: ssid_string
             anchors.centerIn: parent
-            text: parent.modelData
+            text: ssid
             color: isCurrent ? "white":"black"
         }
 

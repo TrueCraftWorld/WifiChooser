@@ -5,17 +5,17 @@ import BackEnd 1.0
 
 Item {
     id: wifiRoot
-
+    property var theModel: null
     NetworkSearch {
         id: wifi_handle
         onAvailableWiFiNetsChanged: {
-            ssid_selector.model = wifi_handle.availableWiFiNets
-            ssid_selector.currentIndex = wifi_handle.activeSsidIdx
+            // ssid_selector.model = wifi_handle.availableWiFiNets
+            // ssid_selector.currentIndex = wifi_handle.activeSsidIdx
         }
         onWifiStateChanged: {
             if (wifi_handle.wifiState) {
                 ssid_selector.visible = true
-                ssid_selector.model = wifi_handle.availableWiFiNets
+                // ssid_selector.model = wifi_handle.wifiList
             } else {
                 ssid_selector.visible = false
             }
@@ -25,6 +25,12 @@ Item {
             wifi_busy.running = false;
         }
     }
+    Component.onCompleted: {
+        theModel = wifi_handle.wifiModel
+        ssid_selector.model = theModel
+        // theModel.lo
+    }
+
     UpdateClient {
         id: update_handle
     }
@@ -86,7 +92,7 @@ Item {
         WifiView {
             id: ssid_selector
             height: viewContainer.height
-            model: wifi_handle.availableWiFiNets
+            // model: theModel
             enabled: !wifi_busy.running
             anchors {
                 top: ssid_selector_title.bottom
