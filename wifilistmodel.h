@@ -3,6 +3,7 @@
 
 #include <QAbstractListModel>
 #include <QObject>
+// #define DEBUG
 
 struct WiFiItem {
     QString ssid;

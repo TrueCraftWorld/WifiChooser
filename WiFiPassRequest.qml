@@ -8,7 +8,7 @@ Rectangle {
     radius: 10
     opacity: 1
     property string ssid_name
-    signal passwordAccepted(password: string)
+    signal passwordAccepted(ssid: string, password: string)
     signal destroyMe()
     anchors {
         top: parent.top
@@ -81,7 +81,7 @@ Rectangle {
             text: qsTr("Подключить")
         }
         onClicked: {
-            passwordAccepted(passwd_text.text)
+            passwordAccepted(ssid_name, passwd_text.text)
         }
     }
     StyledButton {

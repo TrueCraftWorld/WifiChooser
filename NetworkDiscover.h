@@ -94,7 +94,7 @@ public:
      * @param pass - пароль сети
      * @return результат подключения
      */
-    Q_INVOKABLE bool tryConnect(int idx, const QString& pass);
+    Q_INVOKABLE bool tryConnect(const QString &ssid, const QString &pass);
     /**
      * @brief Возвращает состояние wifi
      * @return
@@ -136,7 +136,7 @@ public:
     //  */
     // Q_INVOKABLE const WiFiListModel& wifiList();
 
-    WiFiListModel *wifiModel() const;
+    Q_INVOKABLE WiFiListModel *wifiModel();
 
 signals:
     /**
@@ -196,6 +196,8 @@ private:
      * @param msecTimeout максимальное время ожидания завершения команды
      * @return
      */
+
+    bool isBusy = false;
 
     void addCommand(CommPtr command, bool isUrgent = false);
 

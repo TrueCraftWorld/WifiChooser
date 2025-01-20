@@ -4,10 +4,10 @@ import com.melije.pulltorefresh 2.0
 ListView {
     id: wifi_view
     width: parent.width * .9
-    // required model
+    required model
     property var passwordPopUp: null
     property int requstedSsidIdx;
-    signal networkChosen(id: int, passwd: string)
+    signal networkChosen(ssid: string, passwd: string)
     signal updateMe
 
 
@@ -24,8 +24,8 @@ ListView {
             }
         }
     }
-    function tryConnection(passwd: string) {
-        networkChosen(wifi_view.requstedSsidIdx, passwd)
+    function tryConnection(ssid: string, passwd: string) {
+        networkChosen(ssid, passwd)
         deletePasswordPopUp()
     }
 
@@ -45,14 +45,14 @@ ListView {
     delegate: Rectangle {
         id: wifi_deledgate
 
-        required property string ssid
+        // required property string ssid
         property var view: ListView.view
         property bool isCurrent: ListView.isCurrentItem
 
 
         border.color: "#005c9f"
-        // color:  "#005c9f"
-        color: isCurrent ? "#005c9f":"#d8d8d8"
+        color:  "#d8d8d8"
+        // color: isCurrent ? "#005c9f":"#d8d8d8"
         radius: 10
 
         anchors.margins: 20
@@ -62,7 +62,8 @@ ListView {
             id: ssid_string
             anchors.centerIn: parent
             text: ssid
-            color: isCurrent ? "white":"black"
+            color:  "black"
+            // color: isCurrent ? "white":"black"
         }
 
         TapHandler {

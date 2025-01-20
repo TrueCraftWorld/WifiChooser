@@ -5,9 +5,10 @@ import BackEnd 1.0
 
 Item {
     id: wifiRoot
-    property var theModel: null
+    // property var theModel: null
     NetworkSearch {
         id: wifi_handle
+        // property wifiModel theModel: wifi_handle.wifiModel
         onAvailableWiFiNetsChanged: {
             // ssid_selector.model = wifi_handle.availableWiFiNets
             // ssid_selector.currentIndex = wifi_handle.activeSsidIdx
@@ -25,11 +26,11 @@ Item {
             wifi_busy.running = false;
         }
     }
-    Component.onCompleted: {
-        theModel = wifi_handle.wifiModel
-        ssid_selector.model = theModel
-        // theModel.lo
-    }
+    // Component.onCompleted: {
+    //     theModel = wifi_handle.wifiModel
+    //     ssid_selector.model = theModel
+    //     // theModel.lo
+    // }
 
     UpdateClient {
         id: update_handle
@@ -92,7 +93,7 @@ Item {
         WifiView {
             id: ssid_selector
             height: viewContainer.height
-            // model: theModel
+            model: wifi_handle.wifiModel
             enabled: !wifi_busy.running
             anchors {
                 top: ssid_selector_title.bottom
@@ -190,7 +191,7 @@ Item {
                 topMargin: 45
             }
             onClicked: {
-                console.log("update_press")
+                // console.log("update_press")
                 update_handle.requestUpdate()
 
             }
@@ -206,9 +207,9 @@ Item {
 
     Connections {
         target: ssid_selector
-        function onNetworkChosen(idx: int, passwd: string) {
+        function onNetworkChosen(ssid: string, passwd: string) {
             wifi_handle.suspendNetSearch()
-            wifi_handle.tryConnect(idx, passwd)
+            wifi_handle.tryConnect(ssid, passwd)
             wifi_busy.running = true;
             // wifi_handle.resumeNetSearch()
         }
