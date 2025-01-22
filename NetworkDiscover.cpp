@@ -45,15 +45,18 @@ QString nmcliCommand(CommPtr command)
         return QString();
     if (command->msecTimeout < 0)
         command->msecTimeout =100;
+
     QProcess process;
+
     process.start("nmcli", command->commandLine);
-    qDebug() << "nmcli " << command->commandLine;
-    process.waitForFinished(command->msecTimeout);
+    // qDebug() << "nmcli " << command->commandLine;
     if (process.state() == QProcess::Running){
         process.terminate();
     }
-    // return QString(process.readAllStandardOutput()).trimmed();
-        return QString(process.readAllStandardOutput());
+    process.waitForFinished(command->msecTimeout);
+
+    return QString(process.readAllStandardOutput());
+
 }
 }
 
@@ -98,12 +101,12 @@ bool NetworkControl::tryConnect(const QString &ssid, const QString &pass)
 
     //защита от пробелов в имени
 
-    QString ssid_name = QString("'%1'").arg(ssid);
-    QString passWrapped = QString("'%1'").arg(pass);
-    CommPtr ptr (new Command(QStringList() /*<< "--wait" << "5"*/ << "device" << "wifi" << "connect" << ssid_name.toStdString().c_str() << "password" << passWrapped.toStdString().c_str(),
+    QString ssid_name = QString("%1").arg(ssid);
+    QString passWrapped = QString("%1").arg(pass);
+    CommPtr ptr (new Command(QStringList() << "--wait" << "7" << "dev" << "wifi" << "connect" << ssid_name.toStdString().c_str() << "password" << passWrapped.toStdString().c_str(),
                              Command::comConnectWifi,
-                             10000));
-    qDebug() <<  "--wait" << "5" << "device" << "wifi" << "connect" << ssid_name.toStdString().c_str() << "password" << passWrapped.toStdString().c_str();
+                             7000));
+    // qDebug() <<  "--wait" << "5" << "device" << "wifi" << "connect" << ssid_name.toStdString().c_str() << "password" << passWrapped.toStdString().c_str();
     addCommand(ptr);
 
     return true;
@@ -196,18 +199,22 @@ void NetworkControl::slotHandleNmcliResponse()
     case Command::comCheckVisibleNetworks:
     {
         m_availableWiFiNets.clear();
-        m_activeSsidIdx = -1;
+        int activeSsidIdx = -1;
         QStringList wifiList = response.split('\n');
 
         for (int idx = 0; idx < wifiList.size(); ++idx) {
             QStringList check = wifiList.at(idx).split(':');
             if (check.size() > 1 && check.at(1).contains('*')) {
-                m_activeSsidIdx = idx;
+                activeSsidIdx = idx;
             }
             m_availableWiFiNets.append(check.at(0));
         }
 #ifndef DEBUG
         m_model->updateWiFiList(m_availableWiFiNets);
+        if (activeSsidIdx != -1) {
+            m_model->setActiveSsid(m_availableWiFiNets.at(activeSsidIdx));
+            qDebug()<<m_availableWiFiNets.at(activeSsidIdx) << "______________";
+        }
 #endif
         // emit availableWiFiNetsChanged();
     }

@@ -9,6 +9,7 @@ struct WiFiItem {
     QString ssid;
     QString bssid; //?
     int presentCounter;
+    bool isConnected = false;
 };
 
 
@@ -19,7 +20,8 @@ public:
     enum CustomRows {
         SsidRole = Qt::UserRole + 1,
         BssidRole,
-        PresentCounterRole
+        PresentCounterRole,
+        ConnectedRole
     };
 
     explicit WiFiListModel(QObject *parent = nullptr);
@@ -27,17 +29,17 @@ public:
 public:
     int rowCount(const QModelIndex &parent) const;
     QVariant data(const QModelIndex &index, int role) const;
-    // bool setData(const QModelIndex &index, const QVariant &value, int role);
     QHash<int, QByteArray> roleNames() const;
 
     void addWiFiItem(const QString &str);
     void removeWiFiItem(int index);
     void updateWiFiList(const QStringList& currVisibleNets);
+    void setActiveSsid(const QString& ssid);
 
 private:
     QMap<QString, int> m_id;
     QList<WiFiItem> m_ssid;
-
+    QString m_activeSsid = "";
 };
 
 #endif // WIFILISTMODEL_H

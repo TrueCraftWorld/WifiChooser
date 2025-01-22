@@ -51,8 +51,8 @@ ListView {
 
 
         border.color: "#005c9f"
-        color:  "#d8d8d8"
-        // color: isCurrent ? "#005c9f":"#d8d8d8"
+        // color:  "#d8d8d8"
+        color: isconnected ? "#005c9f":"#d8d8d8"
         radius: 10
 
         anchors.margins: 20
@@ -62,8 +62,8 @@ ListView {
             id: ssid_string
             anchors.centerIn: parent
             text: ssid
-            color:  "black"
-            // color: isCurrent ? "white":"black"
+            // color:  "black"
+            color: isconnected ? "white":"black"
         }
 
         TapHandler {
