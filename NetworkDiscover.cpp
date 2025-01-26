@@ -47,7 +47,7 @@ QString nmcliCommand(CommPtr command)
         command->msecTimeout =100;
 
     QProcess process;
-
+    process.setEnvironment(QStringList("LC_ALL=C"));
     process.start("nmcli", command->commandLine);
     // qDebug() << "nmcli " << command->commandLine;
     if (process.state() == QProcess::Running){
@@ -89,7 +89,7 @@ void NetworkControl::updateWiFiInfo()
 {
     if (m_searchSuspend)
         return;
-    CommPtr ptr (new Command(QStringList() << "--terse" << "--field" << "SSID,IN-USE" << "device" << "wifi",
+    CommPtr ptr (new Command(QStringList() << "--terse" << "--field" << "SSID,IN-USE" << "device" << "wifi" << "list" << "--rescan" << "yes",
                             Command::comCheckVisibleNetworks,
                             5000));
     addCommand(ptr);
@@ -98,9 +98,6 @@ void NetworkControl::updateWiFiInfo()
 
 bool NetworkControl::tryConnect(const QString &ssid, const QString &pass)
 {
-
-    //защита от пробелов в имени
-
     QString ssid_name = QString("%1").arg(ssid);
     QString passWrapped = QString("%1").arg(pass);
     CommPtr ptr (new Command(QStringList() << "--wait" << "7" << "dev" << "wifi" << "connect" << ssid_name.toStdString().c_str() << "password" << passWrapped.toStdString().c_str(),
@@ -187,7 +184,7 @@ void NetworkControl::timerEvent(QTimerEvent */*event*/)
     if (m_searchSuspend)
         return;
     checkWifiState();
-    // checkIpAddrOnWlan0();
+    checkIpAddrOnWlan0();
     updateWiFiInfo();
 }
 

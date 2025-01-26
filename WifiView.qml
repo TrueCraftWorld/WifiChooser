@@ -6,7 +6,6 @@ ListView {
     width: parent.width * .9
     required model
     property var passwordPopUp: null
-    property int requstedSsidIdx;
     signal networkChosen(ssid: string, passwd: string)
     signal updateMe
 
@@ -68,20 +67,10 @@ ListView {
 
         TapHandler {
             onTapped: {
-                wifi_view.requstedSsidIdx = wifi_view.indexAt(wifi_deledgate.x+1,wifi_deledgate.y+1);
                 createPasswordPopUp(ssid_string.text)
             }
         }
     }
-
-    // Component {
-    //     id: headerComponent
-
-    //     Rectangle {
-    //         width: ListView.view.width
-    //         height: 20
-    //     }
-    // }
 
     PullToRefreshHandler
     {

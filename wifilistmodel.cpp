@@ -128,16 +128,16 @@ void WiFiListModel::setActiveSsid(const QString &ssid)
 {
     if (m_id.contains(m_activeSsid)) {
         m_ssid[m_id[m_activeSsid]].isConnected = false;
-        // emit dataChanged(index(m_id[m_activeSsid]), index(m_id[m_activeSsid]));
-        emit dataChanged(QModelIndex(), QModelIndex());
-        qDebug()<<m_activeSsid<< "old";
+        emit dataChanged(index(m_id[m_activeSsid]), index(m_id[m_activeSsid]));
+        // emit dataChanged(QModelIndex(), QModelIndex());
+        // qDebug()<<m_activeSsid<< "old";
 
     }
     if (m_id.contains(ssid)) {
-        m_ssid[m_id[ssid]].isConnected = false;
-        // emit dataChanged(index(m_id[ssid]), index(m_id[ssid]));
-        emit dataChanged(QModelIndex(), QModelIndex());
-        qDebug()<<ssid << "new";
+        m_ssid[m_id[ssid]].isConnected = true;
+        emit dataChanged(index(m_id[ssid]), index(m_id[ssid]));
+        // emit dataChanged(QModelIndex(), QModelIndex());
+        // qDebug()<<ssid << "new";
     }
     m_activeSsid = ssid;
 }
