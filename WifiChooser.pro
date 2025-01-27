@@ -1,27 +1,9 @@
-QT += quick core network qml concurrent
-
-# You can make your code fail to compile if it uses deprecated APIs.
-# In order to do so, uncomment the following line.
-#DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000    # disables all the APIs deprecated before Qt 6.0.0
-include(3rdParty/PullToRefreshHandler.pri)
-
-CONFIG += c++20
-CONFIG += link_pkgconfig
-CONFIG += disable-desktop
+include(wifichooser.pri)
 
 SOURCES += \
-        NetworkDiscover.cpp \
         main.cpp \
-        updateclient.cpp \
-        wifilistmodel.cpp
 
-RESOURCES += qml.qrc
-
-# Additional import path used to resolve QML modules in Qt Creator's code model
-#QML_IMPORT_PATH =
-
-# Additional import path used to resolve QML modules just for Qt Quick Designer
-#QML_DESIGNER_IMPORT_PATH =
+RESOURCES += qml.qrc \
 
 QT_QPA_ENABLE_TERMINAL_KEYBOARD = 0
 
@@ -34,10 +16,4 @@ QT_QPA_ENABLE_TERMINAL_KEYBOARD = 0
 target.path = /usr/share/qtpr
 INSTALLS += target
 
-HEADERS += \
-    NetworkDiscover.h \
-    package.h \
-    protocolcommand.h \
-    updateConfig.h \
-    updateclient.h \
-    wifilistmodel.h
+
