@@ -32,10 +32,6 @@ Item {
     //     // theModel.lo
     // }
 
-    UpdateClient {
-        id: update_handle
-    }
-
     Rectangle {
         id: topStatus
 
@@ -106,7 +102,6 @@ Item {
     Rectangle {
         id: ipContainer
         width: parent.width * .4
-        // height: parent.height
 
         color: "darkslategray"
         opacity: 0.75
@@ -180,22 +175,6 @@ Item {
             color: "white"
             text: wifi_handle.currentIp
         }
-        Button {
-            id: update_request
-
-            width: 150
-            height: 50
-            anchors {
-                horizontalCenter: parent.horizontalCenter
-                top: ip_text.bottom
-                topMargin: 45
-            }
-            onClicked: {
-                // console.log("update_press")
-                update_handle.requestUpdate()
-
-            }
-        }
 
         StyledBusyIndicator {
             id: wifi_busy
@@ -211,7 +190,6 @@ Item {
             wifi_handle.suspendNetSearch()
             wifi_handle.tryConnect(ssid, passwd)
             wifi_busy.running = true;
-            // wifi_handle.resumeNetSearch()
         }
         function onUpdateMe() {
             wifi_handle.updateWiFiInfo()
