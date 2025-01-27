@@ -1,5 +1,10 @@
 <RCC>
     <qresource prefix="/">
-        <file>main.qml</file>
+        <file>StyledButton.qml</file>
+        <file>StyledSwitch.qml</file>
+        <file>StyledBusyIndicator.qml</file>
+        <file>WiFiConnector.qml</file>
+        <file>WiFiPassRequest.qml</file>
+        <file>WifiView.qml</file>
     </qresource>
 </RCC>

@@ -9,7 +9,7 @@ SOURCES += \
         $$PWD/updateclient.cpp \
         $$PWD/wifilistmodel.cpp
 
-RESOURCES += $$PWD/qml.qrc
+RESOURCES += $$PWD/wifimodule.qrc
 
 HEADERS += \
     $$PWD/NetworkDiscover.h \
