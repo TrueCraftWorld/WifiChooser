@@ -75,9 +75,9 @@ NetworkControl::NetworkControl(QObject* parent)
     checkWifiState();
     updateWiFiInfo();
 
-    m_timer.start(300); ///ну за глаза учитывая, что nmcli штука не быстрая
+    m_timer.start(500); ///ну за глаза учитывая, что nmcli штука не быстрая
 
-    startTimer(5000);
+    startTimer(10000);
 }
 
 QStringList NetworkControl::availableWiFiNets() const
@@ -89,6 +89,7 @@ void NetworkControl::updateWiFiInfo()
 {
     if (m_searchSuspend)
         return;
+
     CommPtr ptr (new Command(QStringList() << "--terse" << "--field" << "SSID,IN-USE" << "device" << "wifi" << "list" << "--rescan" << "yes",
                             Command::comCheckVisibleNetworks,
                             5000));
