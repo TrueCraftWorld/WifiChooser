@@ -7,7 +7,7 @@
 
 struct WiFiItem {
     QString ssid;
-    QString bssid; //?
+    QString bssid; //do we need it since it is non unique?
     int presentCounter;
     bool isConnected = false;
 };

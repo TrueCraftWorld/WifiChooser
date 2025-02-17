@@ -94,7 +94,7 @@ public:
      * @param pass - пароль сети
      * @return результат подключения
      */
-    Q_INVOKABLE bool tryConnect(const QString &ssid, const QString &pass);
+    Q_INVOKABLE void tryConnect(const QString &ssid, const QString &pass);
     /**
      * @brief Возвращает состояние wifi
      * @return

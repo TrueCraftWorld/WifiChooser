@@ -38,6 +38,7 @@ WiFiListModel::WiFiListModel(QObject *parent)
 
 int WiFiListModel::rowCount(const QModelIndex &parent) const
 {
+    Q_UNUSED(parent)
     return m_ssid.size();
 }
 
@@ -63,22 +64,6 @@ QVariant WiFiListModel::data(const QModelIndex &index, int role) const
     return QVariant();
 }
 
-// bool WiFiListModel::setData(const QModelIndex &index, const QVariant &value, int role)
-// {
-//     if (!index.isValid() || index.row() >= m_ssid.size() || role != ConnectedRole)
-//         return false;
-
-//     int row = index.row();
-//     bool result = value.toBool();
-//     for (int i = 0; i < m_ssid.size(); ++i) {
-//         m_ssid[i].isConnected = false;
-//     }
-//     m_ssid[row].isConnected = result;
-//     emit dataChanged(QModelIndex(), QModelIndex());
-
-//     return true;
-// }
-
 void WiFiListModel::addWiFiItem(const QString &str)
 {
     if (m_id.contains(str) || str.isEmpty())
@@ -91,12 +76,10 @@ void WiFiListModel::addWiFiItem(const QString &str)
     m_ssid.prepend(item);
     m_id[str] = 0;
     endInsertRows();
-    // emit dataChanged(QModelIndex(),QModelIndex());
 }
 
 void WiFiListModel::updateWiFiList(const QStringList &currVisibleNets)
 {
-    // qDebug() << currVisibleNets;
 
     foreach (const auto& item, currVisibleNets) {
         if (m_id.contains(item)) {
@@ -129,15 +112,10 @@ void WiFiListModel::setActiveSsid(const QString &ssid)
     if (m_id.contains(m_activeSsid)) {
         m_ssid[m_id[m_activeSsid]].isConnected = false;
         emit dataChanged(index(m_id[m_activeSsid]), index(m_id[m_activeSsid]));
-        // emit dataChanged(QModelIndex(), QModelIndex());
-        // qDebug()<<m_activeSsid<< "old";
-
     }
     if (m_id.contains(ssid)) {
         m_ssid[m_id[ssid]].isConnected = true;
         emit dataChanged(index(m_id[ssid]), index(m_id[ssid]));
-        // emit dataChanged(QModelIndex(), QModelIndex());
-        // qDebug()<<ssid << "new";
     }
     m_activeSsid = ssid;
 }

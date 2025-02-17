@@ -37,20 +37,16 @@ ListView {
 
     spacing: 5
 
-    // header: headerComponent
     clip: true
 
 
     delegate: Rectangle {
         id: wifi_deledgate
-
-        // required property string ssid
         property var view: ListView.view
         property bool isCurrent: ListView.isCurrentItem
 
 
         border.color: "#005c9f"
-        // color:  "#d8d8d8"
         color: isconnected ? "#005c9f":"#d8d8d8"
         radius: 10
 
@@ -61,7 +57,6 @@ ListView {
             id: ssid_string
             anchors.centerIn: parent
             text: ssid
-            // color:  "black"
             color: isconnected ? "white":"black"
         }
 
