@@ -174,20 +174,17 @@ Item {
         }
 
     }
-    Rectangle {
+
+    ServiceButton {
         id: returnButton
+        text: qsTr("Назад")
         anchors {
             left:parent.left
             bottom: parent.bottom
         }
-        MouseArea {
-            anchors.fill: parent
-            onClicked: wifiRoot.returnButtonPressed()
-        }
-        width: 55
-        height: 55
-        color: "darkblue"
+        onTapped: wifiRoot.returnButtonPressed()
     }
+
     Connections {
         target: ssid_selector
         function onNetworkChosen(ssid: string, passwd: string) {
