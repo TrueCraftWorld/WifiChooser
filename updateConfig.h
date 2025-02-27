@@ -1,6 +1,0 @@
-#ifndef UPDATECONFIG_H
-#define UPDATECONFIG_H
-
-#define UPDATE_SERV_IP "192.168.1.202"
-
-#endif // UPDATECONFIG_H
