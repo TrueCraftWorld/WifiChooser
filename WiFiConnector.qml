@@ -182,7 +182,7 @@ Item {
             bottom: parent.bottom
             margins: 10
         }
-        onClicked: updateRequester.returnButtonPressed()
+        onClicked: wifiRoot.returnButtonPressed()
     }
 
     Connections {
