@@ -1,5 +1,6 @@
 import QtQuick 2.15
 import com.melije.pulltorefresh 2.0
+import StratifyLabs.UI 2.0
 
 ListView {
     id: wifi_view
@@ -8,8 +9,6 @@ ListView {
     property var passwordPopUp: null
     signal networkChosen(ssid: string, passwd: string)
     signal updateMe
-
-
 
     function createPasswordPopUp(ssid_name) {
         if (passwordPopUp === null) {
@@ -40,31 +39,21 @@ ListView {
     clip: true
 
 
-    delegate: Rectangle {
+    delegate: SButton {
         id: wifi_deledgate
         property var view: ListView.view
         property bool isCurrent: ListView.isCurrentItem
 
-
-        border.color: "#005c9f"
-        color: isconnected ? "#005c9f":"#d8d8d8"
-        radius: 10
-
-        anchors.margins: 20
-        height: 65
-        width: ListView.view.width
-        Text {
-            id: ssid_string
-            anchors.centerIn: parent
-            text: ssid
-            color: isconnected ? "white":"black"
+        style: isconnected ? "btn-success lg":"btn-outline-secondary lg"
+        anchors
+        {
+            topMargin: 15
+            bottomMargin: 5
         }
 
-        TapHandler {
-            onTapped: {
-                createPasswordPopUp(ssid_string.text)
-            }
-        }
+        text: ssid
+        onClicked: createPasswordPopUp(wifi_deledgate.text)
+        width: ListView.view.width * .8
     }
 
     PullToRefreshHandler

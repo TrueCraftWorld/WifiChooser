@@ -2,14 +2,15 @@ import QtQuick 2.15
 import QtQuick.Controls 2.15
 
 import BackEnd 1.0
+import StratifyLabs.UI 2.0
 
 Item {
     id: wifiRoot
     signal returnButtonPressed();
+
     NetworkSearch {
         id: wifi_handle
-        onAvailableWiFiNetsChanged: {
-        }
+        // onAvailableWiFiNetsChanged: {}
         onWifiStateChanged: {
             if (wifi_handle.wifiState) {
                 ssid_selector.visible = true
@@ -23,29 +24,22 @@ Item {
         }
     }
 
-    Rectangle {
-        id: topStatus
+    SLabel{
+      style: "btn-naked"
+      id: topStatus
 
-        height: 50
-        anchors{
-            left: parent.left
-            right: parent.right
-            top: parent.top
-        }
-        Text {
-            anchors.fill: parent
-            horizontalAlignment: Text.AlignHCenter
-            verticalAlignment: Text.AlignVCenter
-            // font.bold: true
-            color: "black"
-            text: qsTr("Настройки сети")
-        }
+      height: 50
+      anchors{
+          left: parent.left
+          right: parent.right
+          top: parent.top
+      }
+      text: qsTr("Настройки сети")
     }
 
-    Rectangle {
+    SContainer {
         id: viewContainer
         width: parent.width * .6
-        // height: parent.height
 
         color: "darkslategray"
         opacity: 0.75
@@ -59,22 +53,17 @@ Item {
             left: ipContainer.right
             bottom: parent.bottom
         }
-        Rectangle{
+        SLabel {
             id: ssid_selector_title
-            color: "darkslategray"
-            width: parent.width
+            style: "label-info lg";
+
             height: 50
             anchors {
+                left:  parent.left
+                right: parent.right
                 top: parent.top
             }
-            Text {
-                anchors.fill: parent
-                horizontalAlignment: Text.AlignHCenter
-                verticalAlignment: Text.AlignVCenter
-                // font.bold: true
-                color: "white"
-                text: qsTr("Доступные Wi-Fi сети")
-            }
+            text :qsTr("Доступные Wi-Fi сети")
         }
 
         WifiView {
@@ -90,7 +79,7 @@ Item {
         }
     }
 
-    Rectangle {
+    SContainer {
         id: ipContainer
         width: parent.width * .4
 
@@ -106,11 +95,23 @@ Item {
             left: parent.left
             bottom: parent.bottom
         }
+        SLabel {
+            id: common_title
+            style: "label-info lg";
+
+            height: 50
+            anchors {
+                left:  parent.left
+                right: parent.right
+                top: parent.top
+            }
+            text :qsTr("Общие")
+        }
         StyledSwitch {
             id:wifiSwitch
 
             anchors {
-                top: parent.top
+                top: common_title.bottom
                 left: parent.left
                 leftMargin: 25
                 topMargin: 25
@@ -137,33 +138,30 @@ Item {
             enabled: false
         }
 
-        Text {
+        SLabel {
             id: ip_title
-
-            width: parent.width
             anchors {
                 top: vpnSwitch.bottom
                 left: parent.left
                 topMargin: 40
                 leftMargin: 10
-
+                rightMargin: 10
             }
-            color: "white"
+            style: "btn-naked"
             text:qsTr("Текущий IP-адрес устройства:")
         }
 
-        Text {
+        SLabel {
             id: ip_text
 
-            width: parent.width
             anchors {
                 top: ip_title.bottom
                 left: parent.left
                 topMargin: 15
                 leftMargin: 10
-
+                rightMargin: 10
             }
-            color: "white"
+            style: "label-info"
             text: wifi_handle.currentIp
         }
 
@@ -175,14 +173,16 @@ Item {
 
     }
 
-    ServiceButton {
+    SButton {
         id: returnButton
+        style: "btn-secondary"
         text: qsTr("Назад")
         anchors {
             left:parent.left
             bottom: parent.bottom
+            margins: 10
         }
-        onTapped: wifiRoot.returnButtonPressed()
+        onClicked: updateRequester.returnButtonPressed()
     }
 
     Connections {

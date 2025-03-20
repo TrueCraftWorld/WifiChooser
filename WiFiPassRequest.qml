@@ -1,6 +1,8 @@
 import QtQuick 2.15
 import QtQuick.Controls 2.15
 
+import StratifyLabs.UI 2.0
+
 Rectangle {
     id: pass_req_root
     width: 600
