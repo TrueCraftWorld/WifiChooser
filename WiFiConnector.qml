@@ -25,10 +25,10 @@ Item {
     }
 
     SLabel{
-      style: "btn-naked"
+      style: "label-primary lg"
       id: topStatus
 
-      height: 50
+      // height: 50
       anchors{
           left: parent.left
           right: parent.right
@@ -42,7 +42,7 @@ Item {
         width: parent.width * .6
 
         color: "darkslategray"
-        opacity: 0.75
+        // opacity: 0.75
         border {
             width: 1
             color: "black"
@@ -62,6 +62,7 @@ Item {
                 left:  parent.left
                 right: parent.right
                 top: parent.top
+                margins: 15
             }
             text :qsTr("Доступные Wi-Fi сети")
         }
@@ -74,7 +75,9 @@ Item {
             anchors {
                 top: ssid_selector_title.bottom
                 bottom: parent.bottom
-                horizontalCenter: parent.horizontalCenter
+                left: ssid_selector_title.left
+                right: ssid_selector_title.right
+                horizontalCenter: ssid_selector_title.horizontalCenter
             }
         }
     }
@@ -84,7 +87,7 @@ Item {
         width: parent.width * .4
 
         color: "darkslategray"
-        opacity: 0.75
+        // opacity: 0.75
         border {
             width: 1
             color: "black"
@@ -94,6 +97,7 @@ Item {
             top: topStatus.bottom
             left: parent.left
             bottom: parent.bottom
+
         }
         SLabel {
             id: common_title
@@ -104,6 +108,8 @@ Item {
                 left:  parent.left
                 right: parent.right
                 top: parent.top
+                margins: 15
+
             }
             text :qsTr("Общие")
         }

@@ -8,7 +8,7 @@ Rectangle {
     width: 600
     height: 300
     radius: 10
-    opacity: 1
+    opacity: 0.75
     property string ssid_name
     signal passwordAccepted(ssid: string, password: string)
     signal destroyMe()

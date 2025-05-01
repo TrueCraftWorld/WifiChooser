@@ -1,10 +1,12 @@
 import QtQuick 2.15
+import QtQuick.Layouts 1.15
 import com.melije.pulltorefresh 2.0
 import StratifyLabs.UI 2.0
 
 ListView {
     id: wifi_view
-    width: parent.width * .9
+    width: parent.width
+
     required model
     property var passwordPopUp: null
     signal networkChosen(ssid: string, passwd: string)
@@ -34,11 +36,17 @@ ListView {
         }
     }
 
+
+    layoutDirection: Qt.LeftToRight
+    verticalLayoutDirection: ListView.TopToBottom
+    displayMarginBeginning: 15
+    displayMarginEnd: 15
     spacing: 5
 
     clip: true
 
-
+    header: Item { width: parent.width; height: 15 }
+    footer: Item { width: parent.width; height: 15 }
     delegate: SButton {
         id: wifi_deledgate
         property var view: ListView.view
@@ -47,10 +55,12 @@ ListView {
         style: isconnected ? "btn-success lg":"btn-outline-secondary lg"
         anchors
         {
+            horizontalCenter: parent.horizontalCenter
             topMargin: 15
             bottomMargin: 5
         }
 
+        Layout.alignment: Qt.AlignHCenter | Qt.AlignTop
         text: ssid
         onClicked: createPasswordPopUp(wifi_deledgate.text)
         width: ListView.view.width * .8
