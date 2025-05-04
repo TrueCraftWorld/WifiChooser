@@ -154,6 +154,7 @@ Item {
                 rightMargin: 10
             }
             style: "btn-naked"
+            color: "white"
             text:qsTr("Текущий IP-адрес устройства:")
         }
 
@@ -186,7 +187,7 @@ Item {
         anchors {
             left:parent.left
             bottom: parent.bottom
-            margins: 10
+            margins: 15
         }
         onClicked: wifiRoot.returnButtonPressed()
     }
