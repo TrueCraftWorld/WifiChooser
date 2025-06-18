@@ -136,7 +136,7 @@ public:
     //  */
     // Q_INVOKABLE const WiFiListModel& wifiList();
 
-    Q_INVOKABLE WiFiListModel *wifiModel();
+    Q_INVOKABLE WiFiListModel *wifiModel() const;
 
 signals:
     /**

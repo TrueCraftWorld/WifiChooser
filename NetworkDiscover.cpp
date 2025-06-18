@@ -304,7 +304,7 @@ bool Command::empty() const
     return isEmpty;
 }
 
-WiFiListModel *NetworkControl::wifiModel()
+WiFiListModel *NetworkControl::wifiModel() const
 {
     return m_model;
 }
